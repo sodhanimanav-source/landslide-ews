@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landslide EWS Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen">
+    <header class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+        <div>
+            <h1 class="text-xl font-bold text-emerald-400">Landslide EWS — Northeast Region</h1>
+            <p class="text-xs text-slate-400">AI-Powered Early Warning & Incident Response</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/report" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-3 py-1.5 rounded-lg transition">+ Submit Report</a>
+            <span class="text-xs bg-emerald-950 border border-emerald-500/40 text-emerald-400 px-2.5 py-1 rounded-full">● Live</span>
+        </div>
+    </header>
+
+    <main class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Map View -->
+        <section class="lg:col-span-2 bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-sm font-semibold text-slate-300">Live Hazard Map (NER)</h2>
+                <div class="text-xs flex gap-3 text-slate-400">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-red-500 rounded-full inline-block"></span> High Risk</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-amber-500 rounded-full inline-block"></span> Medium</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span> Low</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-cyan-400 rounded-full inline-block"></span> Citizen Report</span>
+                </div>
+            </div>
+            <div id="map" class="h-[520px] w-full rounded-lg"></div>
+        </section>
+
+        <!-- Right Side Panel -->
+        <section class="flex flex-col gap-5">
+            <!-- Priority Watchlist -->
+            <div class="bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700">
+                <h2 class="text-sm font-semibold text-slate-300 mb-3">Priority Watchlist</h2>
+                <div id="zone-list" class="space-y-2 text-sm max-h-56 overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-500">Loading risk zones...</p>
+                </div>
+            </div>
+
+            <!-- Citizen Field Reports -->
+            <div class="bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700">
+                <h2 class="text-sm font-semibold text-slate-300 mb-3">Recent Incident Reports</h2>
+                <div id="report-list" class="space-y-2 text-xs max-h-56 overflow-y-auto pr-1">
+                    <p class="text-slate-500">Fetching citizen reports...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const map = L.map('map').setView([26.2006, 92.9376], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // 1. Fetch & Plot Risk Zones
+        fetch('/api/risk-zones/')
+            .then(res => res.json())
+            .then(zones => {
+                const listContainer = document.getElementById('zone-list');
+                listContainer.innerHTML = '';
+
+                zones.forEach(zone => {
+                    const color = zone.severity === 'High' ? '#ef4444' : zone.severity === 'Medium' ? '#f59e0b' : '#10b981';
+                    
+                    const circle = L.circleMarker([zone.lat, zone.lng], {
+                        radius: 9,
+                        fillColor: color,
+                        color: '#fff',
+                        weight: 1.5,
+                        fillOpacity: 0.85
+                    }).addTo(map);
+
+                    circle.bindPopup(`
+                        <div class="text-slate-900">
+                            <h3 class="font-bold">${zone.name}</h3>
+                            <p class="text-xs">${zone.state}</p>
+                            <p class="text-xs font-semibold mt-1" style="color: ${color}">Risk Score: ${zone.risk_score}%</p>
+                        </div>
+                    `);
+
+                    const item = document.createElement('div');
+                    item.className = `p-2.5 rounded-lg flex justify-between items-center border ${
+                        zone.severity === 'High' ? 'bg-red-950/40 border-red-800/40 text-red-200' :
+                        zone.severity === 'Medium' ? 'bg-amber-950/40 border-amber-800/40 text-amber-200' :
+                        'bg-emerald-950/40 border-emerald-800/40 text-emerald-200'
+                    }`;
+                    item.innerHTML = `<div><p class="font-semibold">${zone.name}</p><p class="text-[10px] opacity-75">${zone.state}</p></div><span class="font-bold">${zone.risk_score}%</span>`;
+                    listContainer.appendChild(item);
+                });
+            });
+
+        // 2. Fetch & Plot Citizen Reports
+        fetch('/api/reports/')
+            .then(res => res.json())
+            .then(reports => {
+                const reportContainer = document.getElementById('report-list');
+                if (reports.length === 0) {
+                    reportContainer.innerHTML = '<p class="text-slate-500">No incident reports logged yet.</p>';
+                    return;
+                }
+                reportContainer.innerHTML = '';
+
+                reports.forEach(r => {
+                    const repMarker = L.circleMarker([r.lat, r.lng], {
+                        radius: 7,
+                        fillColor: '#22d3ee',
+                        color: '#ffffff',
+                        weight: 2,
+                        fillOpacity: 0.9
+                    }).addTo(map);
+
+                    repMarker.bindPopup(`
+                        <div class="text-slate-900">
+                            <h4 class="font-bold text-xs text-cyan-700">Citizen Hazard Pin</h4>
+                            <p class="text-xs mt-1">${r.description}</p>
+                            <span class="text-[10px] text-slate-500">${new Date(r.created_at).toLocaleString()}</span>
+                        </div>
+                    `);
+
+                    const rCard = document.createElement('div');
+                    rCard.className = 'p-2 bg-slate-900/60 border border-cyan-800/40 rounded-lg';
+                    rCard.innerHTML = `
+                        <p class="font-medium text-cyan-300">${r.description}</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Lat: ${r.lat.toFixed(3)}, Lng: ${r.lng.toFixed(3)}</p>
+                    `;
+                    reportContainer.appendChild(rCard);
+                });
+            });
+    </script>
+</body>
+</html>

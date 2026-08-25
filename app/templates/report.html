@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Landslide Incident</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-6 flex flex-col items-center">
+    <div class="max-w-xl w-full bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-bold text-emerald-400">Citizen Incident Report</h1>
+            <a href="/" class="text-xs text-slate-400 hover:text-emerald-300">← Back to Map</a>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Click on the mini-map to pin the exact hazard location or allow GPS.</p>
+
+        <div id="mini-map" class="h-48 w-full rounded-lg mb-4 border border-slate-600"></div>
+
+        <form id="report-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Latitude</label>
+                    <input type="number" step="any" id="lat" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Longitude</label>
+                    <input type="number" step="any" id="lng" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">Incident Description</label>
+                <textarea id="description" rows="3" required placeholder="Describe soil movement, cracks, road blockage..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-lg text-sm transition">
+                Submit Field Report
+            </button>
+        </form>
+        <p id="status-msg" class="mt-3 text-xs text-center hidden"></p>
+    </div>
+
+    <script>
+        const miniMap = L.map('mini-map').setView([26.2006, 92.9376], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+
+        let marker;
+        miniMap.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+            document.getElementById('lat').value = lat.toFixed(5);
+            document.getElementById('lng').value = lng.toFixed(5);
+
+            if (marker) miniMap.removeLayer(marker);
+            marker = L.marker([lat, lng]).addTo(miniMap);
+        });
+
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('status-msg');
+            msg.className = "mt-3 text-xs text-center text-amber-400 block";
+            msg.innerText = "Submitting report...";
+
+            const payload = {
+                lat: parseFloat(document.getElementById('lat').value),
+                lng: parseFloat(document.getElementById('lng').value),
+                description: document.getElementById('description').value
+            };
+
+            const res = await fetch('/api/reports/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                msg.className = "mt-3 text-xs text-center text-emerald-400 block";
+                msg.innerText = "✓ Incident report submitted successfully!";
+                document.getElementById('report-form').reset();
+            } else {
+                msg.className = "mt-3 text-xs text-center text-red-400 block";
+                msg.innerText = "Failed to submit report.";
+            }
+        });
+    </script>
+</body>
+</html>
