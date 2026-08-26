@@ -9,7 +9,6 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Landslide EWS API")
 
-# Ensure static directory exists
 os.makedirs("app/static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -22,11 +21,11 @@ app.include_router(alerts.router)
 
 @app.get("/")
 def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="dashboard.html")
 
 @app.get("/report")
 def report_page(request: Request):
-    return templates.TemplateResponse("report.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="report.html")
 
 @app.get("/api/health")
 def health():
