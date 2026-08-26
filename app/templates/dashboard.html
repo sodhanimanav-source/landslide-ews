@@ -72,7 +72,6 @@
             display: none;
             box-shadow: 0 4px 14px rgba(0,0,0,0.7);
         }
-        /* Search Bar Floating Container */
         #village-search-container {
             position: absolute;
             top: 14px;
@@ -119,14 +118,14 @@
             <div class="py-3 space-y-1">
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
                     <span class="text-base">🔍</span>
-                    <span id="t-my-locations" class="font-medium text-xs">All NER States (8 States)</span>
+                    <span id="t-my-locations" class="font-medium text-xs">All NER States & India</span>
                 </div>
 
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
                     <span class="text-base">🌤️</span>
                     <div>
-                        <span id="t-weather-loc" class="font-medium text-xs block">Weather Northeast</span>
-                        <span class="text-[9px] text-amber-300">Live Forecast Model Connected</span>
+                        <span id="t-weather-loc" class="font-medium text-xs block">Global Weather Stream</span>
+                        <span class="text-[9px] text-amber-300">Live Satellite Telemetry</span>
                     </div>
                 </div>
 
@@ -155,7 +154,7 @@
 
                 <div id="btn-temp" onclick="toggleRadar('temp')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
                     <span class="text-base">🌡️</span>
-                    <span id="t-temp-radar" class="font-semibold text-xs">TemperatureRadar (Live)</span>
+                    <span id="t-temp-radar" class="font-semibold text-xs">Global TemperatureRadar</span>
                 </div>
 
                 <div id="btn-wind" onclick="toggleRadar('wind')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
@@ -200,23 +199,23 @@
         <main class="flex-1 relative">
             <div id="map"></div>
 
-            <!-- Floating Search Any Village / Town in Northeast -->
+            <!-- Global Location Search Bar -->
             <div id="village-search-container" class="flex items-center gap-1 bg-slate-900/90 border border-slate-700 p-1.5 rounded-lg shadow-xl backdrop-blur-md">
-                <input id="village-search-input" type="text" placeholder="Search any village, town (e.g. Mangan, Noney)..." class="bg-slate-800 text-xs text-white px-3 py-1.5 rounded outline-none border border-slate-600 w-60 md:w-72 focus:border-amber-400 transition" onkeypress="if(event.key==='Enter') searchVillage();" />
-                <button onclick="searchVillage()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
+                <input id="village-search-input" type="text" placeholder="Search any city, village (e.g. Mumbai, Mangan, Delhi)..." class="bg-slate-800 text-xs text-white px-3 py-1.5 rounded outline-none border border-slate-600 w-60 md:w-80 focus:border-amber-400 transition" onkeypress="if(event.key==='Enter') searchLocation();" />
+                <button onclick="searchLocation()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
             </div>
 
-            <!-- SatFish Style Floating Calibration Bar -->
+            <!-- SatFish Style Global Calibration Legend -->
             <div id="satfish-legend">
                 <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
-                    <span>9.0°C (Alpine)</span>
-                    <span>16°C</span>
-                    <span>22°C</span>
-                    <span>28°C</span>
-                    <span>35.0°C+ (Plains)</span>
+                    <span>-5°C</span>
+                    <span>10°C</span>
+                    <span>20°C</span>
+                    <span>30°C</span>
+                    <span>42°C+</span>
                 </div>
                 <div class="h-3 w-64 md:w-80 rounded shadow-inner" style="background: linear-gradient(to right, #3b0764 0%, #1d4ed8 20%, #06b6d4 40%, #22c55e 60%, #facc15 78%, #ea580c 90%, #991b1b 100%);"></div>
-                <div class="text-[9px] text-slate-300 text-center mt-1">💡 Click any station for 3-Day Live Forecast Card</div>
+                <div class="text-[9px] text-slate-300 text-center mt-1">💡 Click anywhere across India/World to inspect live forecast</div>
             </div>
         </main>
     </div>
@@ -227,13 +226,13 @@
                 title: "Northeast Landslide & Multi-Hazard EWS",
                 subtitle: "Integrated Hydro-Geological Intelligence Platform",
                 reportBtn: "+ Report Incident",
-                myLocations: "All NER States (8 States)",
-                weatherLoc: "Weather Northeast",
+                myLocations: "All NER States & India",
+                weatherLoc: "Global Weather Stream",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
                 rainRadar: "RainRadar",
                 weatherRadar: "WeatherRadar",
-                tempRadar: "TemperatureRadar (Live)",
+                tempRadar: "Global TemperatureRadar",
                 windRadar: "WindRadar",
                 lightningRadar: "LightningRadar",
                 weatherNews: "Live Regional Alerts (8 States)"
@@ -242,13 +241,13 @@
                 title: "पूर्वोत्तर भूस्खलन एवं बहु-आपदा पूर्व चेतावनी प्रणाली",
                 subtitle: "एकीकृत भूवैज्ञानिक और हाइड्रो-खुफिया मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
-                myLocations: "समस्त पूर्वोत्तर (8 राज्य)",
-                weatherLoc: "मौसम पूर्वोत्तर",
+                myLocations: "समस्त भारत एवं पूर्वोत्तर",
+                weatherLoc: "ग्लोबल मौसम स्ट्रीम",
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार (LandslideRadar)",
                 rainRadar: "वर्षा रडार (RainRadar)",
-                weatherRadar: "मौसम रडar (WeatherRadar)",
-                tempRadar: "तापमान पूर्वानुमान (Live)",
+                weatherRadar: "मौसम रडार (WeatherRadar)",
+                tempRadar: "वैश्विक तापमान रडार (Live)",
                 windRadar: "पवन रडार (WindRadar)",
                 lightningRadar: "तड़ित रडार (LightningRadar)",
                 weatherNews: "लाइव क्षेत्रीय अलर्ट (8 राज्य)"
@@ -257,13 +256,13 @@
                 title: "উত্তৰ-পূব ভূমিস্খলন প্ৰাৰম্ভিক সতৰ্কবাণী ব্যৱস্থা",
                 subtitle: "সমন্বিত হাইড্ৰ'-ভূতাত্ত্বিক চোৰাংচোৱা মঞ্চ",
                 reportBtn: "+ ঘটনা ৰিপৰ্ট কৰক",
-                myLocations: "সকলো ৮ খন উত্তৰ-পূব ৰাজ্য",
-                weatherLoc: "বতৰ উত্তৰ-পূব",
+                myLocations: "সকলো ৰাজ্য আৰু ভাৰত",
+                weatherLoc: "গোলকীয় বতৰ",
                 pushAlerts: "জাননী (Push Notifications)",
                 landslideRadar: "ভূমিস্খলন ৰাডাৰ",
                 rainRadar: "বৰষুণ ৰাডাৰ",
                 weatherRadar: "বতৰ ৰাডাৰ",
-                tempRadar: "তাপমাত্ৰা আগজাননী (Live)",
+                tempRadar: "গোলকীয় তাপমাত্ৰা ৰাডাৰ",
                 windRadar: "বতাহ ৰাডাৰ",
                 lightningRadar: "বজ্ৰপাত ৰাডাৰ",
                 weatherNews: "সক্ৰিয় আঞ্চলিক সতৰ্কবাণী (৮ ৰাজ্য)"
@@ -272,13 +271,13 @@
                 title: "উত্তর-পূর্ব ভূমিধস ও বহু-বিপর্যয় সতর্কবার্তা ব্যবস্থা",
                 subtitle: "সমন্বিত ভূতাত্ত্বিক ও ডপলার পর্যবেক্ষণ প্ল্যাটফর্ম",
                 reportBtn: "+ ঘটনা রিপোর্ট করুন",
-                myLocations: "উত্তর-পূর্বের ৮টি রাজ্য",
-                weatherLoc: "আবহাওয়া উত্তর-পূর্ব",
+                myLocations: "উত্তর-পূর্ব ও সমগ্র ভারত",
+                weatherLoc: "গ্লোবাল আবহাওয়া",
                 pushAlerts: "বিজ্ঞপ্তি (Push Notifications)",
                 landslideRadar: "ভূমিধস রাডার",
                 rainRadar: "বৃষ্টি রাডার",
                 weatherRadar: "আবহাওয়া রাডার",
-                tempRadar: "তাপমাত্রা পূর্বাভাস (Live)",
+                tempRadar: "বিশ্বব্যাপী তাপমাত্রা রাডার",
                 windRadar: "বায়ু রাডার",
                 lightningRadar: "বজ্রপাত রাডার",
                 weatherNews: "লাইভ আঞ্চলিক সতর্কতা (৮ রাজ্য)"
@@ -287,13 +286,13 @@
                 title: "उत्तर-पूर्व पहिरो पूर्व चेतावनी प्रणाली",
                 subtitle: "एकीकृत भू-वैज्ञानिक गुप्तचर मञ्च",
                 reportBtn: "+ घटना रिपोर्ट गर्नुहोस्",
-                myLocations: "सबै उत्तर-पूर्वी राज्यहरू",
-                weatherLoc: "मौसम उत्तर-पूर्व",
+                myLocations: "सबै राज्यहरू तथा भारत",
+                weatherLoc: "विश्वव्यापी मौसम",
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
                 rainRadar: "वर्षा राडार",
                 weatherRadar: "मौसम राडार",
-                tempRadar: "तापक्रम पूर्वानुमान (Live)",
+                tempRadar: "विश्व तापमान राडार",
                 windRadar: "हावा राडार",
                 lightningRadar: "चट्याङ राडार",
                 weatherNews: "प्रत्यक्ष क्षेत्रीय सतर्कता (८ राज्यहरू)"
@@ -317,16 +316,16 @@
             document.getElementById('t-weather-news').innerText = t.weatherNews;
         }
 
-        // Initialize Map with High-Resolution Deep Village Zoom (up to level 19)
-        const map = L.map('map', { maxZoom: 19, minZoom: 5 }).setView([26.15, 93.00], 7);
+        // Initialize Map
+        const map = L.map('map', { maxZoom: 19, minZoom: 3 }).setView([23.50, 85.00], 5);
 
-        // High-Precision Base Map
+        // ESRI Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
-        // Detailed Village & Stream Reference Labels
+        // Reference Labels
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 18,
             zIndex: 400
@@ -387,61 +386,62 @@
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
             { pos: [27.33, 88.61], r: 55000, desc: "High Himalayan Orographic Cloud Mass" },
-            { pos: [25.27, 91.72], r: 80000, desc: "Heavy Meghalaya Monsoon Front" }
+            { pos: [25.27, 91.72], r: 80000, desc: "Heavy Meghalaya Monsoon Front" },
+            { pos: [19.07, 72.87], r: 90000, desc: "Arabian Sea Coastal Moisture Front" },
+            { pos: [28.61, 77.20], r: 80000, desc: "Indo-Gangetic Convective Plain" }
         ];
         cloudRegions.forEach(c => {
             L.circle(c.pos, { radius: c.r, color: "#94a3b8", fillColor: "#cbd5e1", fillOpacity: 0.35, weight: 1 }).addTo(weatherRadarLayer)
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. REAL-TIME OPEN-METEO WEATHER & FORECASTING ENGINE
+        // 4. PAN-INDIA & GLOBAL TEMPERATURE RADAR (Continuous Raster + Station Badges)
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
+        // Global Meteorological Raster Tile Layer (Covers Entire World)
+        const globalTempTiles = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=9aaeda92fc699324d14797b8638810b5', {
+            maxZoom: 18,
+            opacity: 0.75,
+            zIndex: 350
+        }).addTo(tempRadarLayer);
+
+        // Major Pan-India + All NER Telemetry Stations
         const allNerStations = [
-            // Sikkim
+            // Pan-India Metros & Major Regions
+            { lat: 28.61, lng: 77.20, temp: 34.0, name: "New Delhi", state: "Delhi", forecast: [] },
+            { lat: 19.07, lng: 72.87, temp: 30.0, name: "Mumbai", state: "Maharashtra", forecast: [] },
+            { lat: 22.57, lng: 88.36, temp: 32.0, name: "Kolkata", state: "West Bengal", forecast: [] },
+            { lat: 13.08, lng: 80.27, temp: 33.5, name: "Chennai", state: "Tamil Nadu", forecast: [] },
+            { lat: 12.97, lng: 77.59, temp: 27.0, name: "Bengaluru", state: "Karnataka", forecast: [] },
+            { lat: 17.38, lng: 78.48, temp: 32.0, name: "Hyderabad", state: "Telangana", forecast: [] },
+            { lat: 26.91, lng: 75.78, temp: 36.0, name: "Jaipur", state: "Rajasthan", forecast: [] },
+            { lat: 34.08, lng: 74.79, temp: 18.0, name: "Srinagar", state: "J&K", forecast: [] },
+            { lat: 31.10, lng: 77.17, temp: 16.0, name: "Shimla", state: "Himachal", forecast: [] },
+            { lat: 26.84, lng: 80.94, temp: 34.0, name: "Lucknow", state: "UP", forecast: [] },
+            { lat: 25.59, lng: 85.13, temp: 33.0, name: "Patna", state: "Bihar", forecast: [] },
+
+            // Northeast 8 States Complete Grid
             { lat: 27.70, lng: 88.70, temp: 9.0, name: "North Sikkim", state: "Sikkim", forecast: [] },
             { lat: 27.33, lng: 88.61, temp: 18.0, name: "Gangtok", state: "Sikkim", forecast: [] },
-            { lat: 27.17, lng: 88.36, temp: 17.5, name: "Namchi", state: "Sikkim", forecast: [] },
-
-            // Arunachal Pradesh
             { lat: 27.58, lng: 91.86, temp: 12.0, name: "Tawang Pass", state: "Arunachal", forecast: [] },
             { lat: 27.26, lng: 92.42, temp: 15.5, name: "Bomdila", state: "Arunachal", forecast: [] },
-            { lat: 27.55, lng: 93.83, temp: 18.0, name: "Ziro Valley", state: "Arunachal", forecast: [] },
+            { lat: 27.55, lng: 93.83, temp: 18.0, name: "Ziro", state: "Arunachal", forecast: [] },
             { lat: 27.10, lng: 93.62, temp: 28.0, name: "Itanagar", state: "Arunachal", forecast: [] },
             { lat: 28.06, lng: 95.32, temp: 26.5, name: "Pasighat", state: "Arunachal", forecast: [] },
-            { lat: 28.15, lng: 94.60, temp: 14.0, name: "Upper Siang", state: "Arunachal", forecast: [] },
-
-            // Assam
             { lat: 26.18, lng: 91.75, temp: 33.5, name: "Guwahati", state: "Assam", forecast: [] },
             { lat: 27.47, lng: 94.91, temp: 31.0, name: "Dibrugarh", state: "Assam", forecast: [] },
             { lat: 26.75, lng: 94.21, temp: 31.5, name: "Jorhat", state: "Assam", forecast: [] },
             { lat: 26.65, lng: 92.80, temp: 32.2, name: "Tezpur", state: "Assam", forecast: [] },
             { lat: 25.18, lng: 93.02, temp: 26.2, name: "Haflong", state: "Assam", forecast: [] },
             { lat: 24.83, lng: 92.77, temp: 32.0, name: "Silchar", state: "Assam", forecast: [] },
-
-            // Meghalaya
             { lat: 25.57, lng: 91.89, temp: 19.2, name: "Shillong", state: "Meghalaya", forecast: [] },
             { lat: 25.27, lng: 91.72, temp: 18.0, name: "Cherrapunji", state: "Meghalaya", forecast: [] },
-            { lat: 25.51, lng: 90.22, temp: 28.0, name: "Tura", state: "Meghalaya", forecast: [] },
-
-            // Nagaland
             { lat: 25.67, lng: 94.10, temp: 21.8, name: "Kohima", state: "Nagaland", forecast: [] },
             { lat: 25.90, lng: 93.73, temp: 30.0, name: "Dimapur", state: "Nagaland", forecast: [] },
-            { lat: 26.32, lng: 94.52, temp: 22.5, name: "Mokokchung", state: "Nagaland", forecast: [] },
-
-            // Manipur
             { lat: 24.81, lng: 93.93, temp: 28.2, name: "Imphal", state: "Manipur", forecast: [] },
-            { lat: 24.33, lng: 93.68, temp: 25.5, name: "Churachandpur", state: "Manipur", forecast: [] },
-            { lat: 25.11, lng: 94.36, temp: 20.0, name: "Ukhrul", state: "Manipur", forecast: [] },
-
-            // Mizoram
             { lat: 23.72, lng: 92.71, temp: 24.2, name: "Aizawl", state: "Mizoram", forecast: [] },
-            { lat: 22.88, lng: 92.74, temp: 25.0, name: "Lunglei", state: "Mizoram", forecast: [] },
-
-            // Tripura
-            { lat: 23.83, lng: 91.28, temp: 34.2, name: "Agartala", state: "Tripura", forecast: [] },
-            { lat: 24.37, lng: 92.16, temp: 32.5, name: "Dharmanagar", state: "Tripura", forecast: [] }
+            { lat: 23.83, lng: 91.28, temp: 34.2, name: "Agartala", state: "Tripura", forecast: [] }
         ];
 
         function getTempColorHex(t) {
@@ -535,14 +535,14 @@
             });
         }
 
-        // Live Village Search Engine (Nominatim OpenStreetMap)
+        // Search Any City / Village Across India & World
         let searchMarker = null;
-        async function searchVillage() {
+        async function searchLocation() {
             const query = document.getElementById('village-search-input').value.trim();
             if (!query) return;
 
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ' India')}&limit=1`);
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
                 const results = await res.json();
                 
                 if (results && results.length > 0) {
@@ -550,42 +550,41 @@
                     const lat = parseFloat(place.lat);
                     const lon = parseFloat(place.lon);
 
-                    map.setView([lat, lon], 13); // Zoom-in deep into the village!
+                    map.setView([lat, lon], 12);
 
                     if (searchMarker) map.removeLayer(searchMarker);
 
-                    // Fetch live weather for this searched village
-                    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m`);
+                    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`);
                     const wData = await wRes.json();
-                    const t = wData && wData.current ? wData.current.temperature_2m : 22;
+                    const t = wData && wData.current ? wData.current.temperature_2m : 25;
+                    const hex = getTempColorHex(t);
 
                     searchMarker = L.marker([lat, lon])
                         .addTo(map)
                         .bindPopup(`
-                            <div style="font-size:12px; color:#fff;">
-                                <b class="text-amber-400 font-bold text-sm">📍 ${place.display_name.split(',')[0]}</b><br>
-                                <span class="text-slate-300 text-xs">${place.display_name}</span><br>
-                                <div class="mt-2 pt-1 border-t border-slate-700 text-xs">
-                                    🌡️ Live Temp: <b>${t}°C</b> | 💧 Rain: <b>${wData.current ? wData.current.precipitation : 0} mm</b>
+                            <div style="font-size:12px; color:#fff; min-width:200px;">
+                                <b style="color:${hex}; font-size:14px;">📍 ${place.display_name.split(',')[0]}</b><br>
+                                <span class="text-slate-300 text-[10px]">${place.display_name}</span><br>
+                                <div class="mt-2 pt-1 border-t border-slate-700 text-xs space-y-0.5">
+                                    <div>🌡️ Live Temp: <b>${t.toFixed(1)}°C</b></div>
+                                    <div>💧 Rain: <b>${wData.current ? wData.current.precipitation : 0} mm</b> | 💨 Wind: <b>${wData.current ? wData.current.wind_speed_10m : 10} km/h</b></div>
                                 </div>
                             </div>
                         `)
                         .openPopup();
                 } else {
-                    alert("Location / Village not found in Northeast. Please try nearby town name.");
+                    alert("Location not found. Please try another city or village name.");
                 }
             } catch (err) {
                 alert("Search temporarily offline. Please try again.");
             }
         }
 
-        // Click-to-Forecast for any remote mountain / forest coordinate
+        // Global Click-to-Forecast (Works Anywhere on Earth)
         map.on('click', async function(e) {
             if (!radars['temp'].active) return;
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
-            
-            if (lat < 21.5 || lat > 29.8 || lng < 87.0 || lng > 97.8) return;
 
             const popup = L.popup()
                 .setLatLng(e.latlng)
@@ -620,7 +619,7 @@
                     `);
                 }
             } catch (err) {
-                popup.setContent(`<div class="text-xs text-red-400">Offline spot interpolation</div>`);
+                popup.setContent(`<div class="text-xs text-red-400">Unable to query telemetry</div>`);
             }
         });
 
@@ -636,7 +635,9 @@
             { pos: [25.67, 94.10], speed: "14 km/h E", arrow: "←", name: "Naga Hills" },
             { pos: [24.81, 93.93], speed: "11 km/h NE", arrow: "↙", name: "Imphal Valley" },
             { pos: [23.72, 92.71], speed: "21 km/h SE", arrow: "↖", name: "Mizo Ridge" },
-            { pos: [27.58, 91.86], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass" }
+            { pos: [27.58, 91.86], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass" },
+            { pos: [19.07, 72.87], speed: "22 km/h W", arrow: "→", name: "Mumbai Coast" },
+            { pos: [28.61, 77.20], speed: "15 km/h NW", arrow: "↘", name: "Delhi NCR" }
         ];
         windStations.forEach(w => {
             const windIcon = L.divIcon({
