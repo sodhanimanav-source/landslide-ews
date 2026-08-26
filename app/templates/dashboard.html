@@ -46,16 +46,28 @@
             50% { transform: scale(1.4); opacity: 0.5; }
             100% { transform: scale(0.9); opacity: 1; }
         }
-        .temp-label {
+        .temp-badge {
             font-size: 11px;
             font-weight: 800;
             color: #ffffff;
             background: rgba(15, 23, 42, 0.85);
             padding: 2px 7px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 2px 6px rgba(0,0,0,0.8);
             white-space: nowrap;
+        }
+        #temp-legend {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            padding: 8px 14px;
+            border-radius: 10px;
+            z-index: 1000;
+            display: none;
         }
     </style>
 </head>
@@ -115,7 +127,7 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Buttons -->
+                <!-- Radar Switcher Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -147,7 +159,7 @@
                 </div>
             </div>
 
-            <!-- Bulletins Feed -->
+            <!-- Scrollable Bulletins Feed -->
             <div class="p-3 border-t border-white/10 bg-black/30 flex flex-col max-h-52 overflow-y-auto">
                 <div class="flex items-center justify-between text-white font-semibold text-xs mb-2">
                     <span class="flex items-center gap-1.5">
@@ -174,8 +186,21 @@
             </div>
         </aside>
 
+        <!-- Right Side: Map Canvas -->
         <main class="flex-1 relative">
             <div id="map"></div>
+            <!-- Temperature Thermal Scale Legend -->
+            <div id="temp-legend">
+                <div class="text-[11px] font-bold text-white mb-1">Temperature Field (°C)</div>
+                <div class="h-3 w-48 rounded" style="background: linear-gradient(to right, #1d4ed8 0%, #06b6d4 25%, #22c55e 50%, #eab308 70%, #ea580c 85%, #dc2626 100%);"></div>
+                <div class="flex justify-between text-[10px] text-slate-300 mt-1 font-semibold">
+                    <span>10°C</span>
+                    <span>18°C</span>
+                    <span>24°C</span>
+                    <span>30°C</span>
+                    <span>36°C+</span>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -351,65 +376,88 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. GUARANTEED VIVID SYNTHETIC THERMAL OVERLAY (Weather&Radar Direct SVG Gradient)
+        // 4. METEOROLOGICAL TOPOGRAPHICAL TEMPERATURE CANVAS ENGINE
         const tempRadarLayer = L.layerGroup();
 
-        // Exact SVG spatial heat map covering Northeast India (22°N to 29.5°N, 87°E to 98°E)
-        const svgHeatmapData = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="100%" height="100%">
-            <defs>
-                <radialGradient id="himalayaCool" cx="40%" cy="15%" r="45%">
-                    <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.85"/>
-                    <stop offset="35%" stop-color="#0284c7" stop-opacity="0.8"/>
-                    <stop offset="70%" stop-color="#06b6d4" stop-opacity="0.75"/>
-                    <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
-                </radialGradient>
-                <radialGradient id="valleyMid" cx="60%" cy="50%" r="40%">
-                    <stop offset="0%" stop-color="#16a34a" stop-opacity="0.8"/>
-                    <stop offset="40%" stop-color="#eab308" stop-opacity="0.78"/>
-                    <stop offset="80%" stop-color="#f97316" stop-opacity="0.7"/>
-                    <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"/>
-                </radialGradient>
-                <radialGradient id="plainsHot" cx="40%" cy="75%" r="45%">
-                    <stop offset="0%" stop-color="#dc2626" stop-opacity="0.85"/>
-                    <stop offset="45%" stop-color="#ea580c" stop-opacity="0.8"/>
-                    <stop offset="75%" stop-color="#facc15" stop-opacity="0.7"/>
-                    <stop offset="100%" stop-color="#16a34a" stop-opacity="0.0"/>
-                </radialGradient>
-            </defs>
-            <rect width="1000" height="800" fill="url(#himalayaCool)"/>
-            <rect width="1000" height="800" fill="url(#valleyMid)" style="mix-blend-mode: screen;"/>
-            <rect width="1000" height="800" fill="url(#plainsHot)" style="mix-blend-mode: screen;"/>
-        </svg>`;
+        // High-Precision NER Observation Network
+        const tempStations = [
+            { lat: 27.58, lng: 91.86, temp: 11, name: "Tawang" },
+            { lat: 27.70, lng: 88.70, temp: 9, name: "North Sikkim" },
+            { lat: 27.33, lng: 88.61, temp: 16, name: "Gangtok" },
+            { lat: 28.15, lng: 94.60, temp: 14, name: "Upper Siang" },
+            { lat: 25.57, lng: 91.89, temp: 19, name: "Shillong" },
+            { lat: 25.67, lng: 94.10, temp: 22, name: "Kohima" },
+            { lat: 23.72, lng: 92.71, temp: 24, name: "Aizawl" },
+            { lat: 25.18, lng: 93.02, temp: 26, name: "Haflong" },
+            { lat: 27.10, lng: 93.62, temp: 27, name: "Itanagar" },
+            { lat: 24.81, lng: 93.93, temp: 28, name: "Imphal" },
+            { lat: 27.47, lng: 94.91, temp: 31, name: "Dibrugarh" },
+            { lat: 26.65, lng: 92.80, temp: 32, name: "Tezpur" },
+            { lat: 26.18, lng: 91.75, temp: 33, name: "Guwahati" },
+            { lat: 23.83, lng: 91.28, temp: 34, name: "Agartala" },
+            { lat: 24.83, lng: 92.77, temp: 32, name: "Silchar" }
+        ];
 
-        const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgHeatmapData);
-        const thermalBounds = [[22.0, 87.5], [29.5, 97.8]];
+        // Inverse Distance Weighting (IDW) Thermal Color Interpolator
+        function getThermalColor(t) {
+            // Weather&Radar standard palette (10°C to 36°C)
+            if (t <= 12) return [29, 78, 216, 0.65];   // Deep Blue (#1d4ed8)
+            if (t <= 16) return [6, 182, 212, 0.65];   // Cyan (#06b6d4)
+            if (t <= 22) return [34, 197, 94, 0.60];   // Emerald Green (#22c55e)
+            if (t <= 26) return [234, 179, 8, 0.60];   // Yellow (#eab308)
+            if (t <= 30) return [249, 115, 22, 0.65];  // Warm Orange (#f97316)
+            return [220, 38, 38, 0.70];                // Crimson Red (#dc2626)
+        }
 
-        // Attach SVG image layer directly into Leaflet map
-        L.imageOverlay(svgUrl, thermalBounds, {
+        function drawThermalCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 280;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(canvas.width, canvas.height);
+
+            const minLat = 22.0, maxLat = 29.5;
+            const minLng = 87.5, maxLng = 97.5;
+
+            for (let y = 0; y < canvas.height; y++) {
+                const lat = maxLat - (y / canvas.height) * (maxLat - minLat);
+                for (let x = 0; x < canvas.width; x++) {
+                    const lng = minLng + (x / canvas.width) * (maxLng - minLng);
+
+                    let num = 0, den = 0;
+                    for (let s of tempStations) {
+                        const d2 = Math.pow(lat - s.lat, 2) + Math.pow(lng - s.lng, 2) + 0.001;
+                        const w = 1 / Math.pow(d2, 1.4);
+                        num += s.temp * w;
+                        den += w;
+                    }
+                    const interpolatedTemp = num / den;
+                    const color = getThermalColor(interpolatedTemp);
+
+                    const idx = (y * canvas.width + x) * 4;
+                    imgData.data[idx] = color[0];
+                    imgData.data[idx + 1] = color[1];
+                    imgData.data[idx + 2] = color[2];
+                    imgData.data[idx + 3] = Math.floor(color[3] * 255);
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return canvas.toDataURL();
+        }
+
+        const thermalBounds = [[22.0, 87.5], [29.5, 97.5]];
+        L.imageOverlay(drawThermalCanvas(), thermalBounds, {
             opacity: 0.85,
             zIndex: 350
         }).addTo(tempRadarLayer);
 
-        // Discrete Temperature Badges
-        const tempTextLabels = [
-            { pos: [26.18, 91.75], text: "Guwahati 33°C" },
-            { pos: [27.33, 88.61], text: "Gangtok 16°C" },
-            { pos: [25.57, 91.89], text: "Shillong 19°C" },
-            { pos: [25.67, 94.10], text: "Kohima 22°C" },
-            { pos: [24.81, 93.93], text: "Imphal 28°C" },
-            { pos: [23.72, 92.71], text: "Aizawl 24°C" },
-            { pos: [23.83, 91.28], text: "Agartala 34°C" },
-            { pos: [27.58, 91.86], text: "Tawang 11°C" },
-            { pos: [27.47, 94.91], text: "Dibrugarh 31°C" }
-        ];
-
-        tempTextLabels.forEach(l => {
+        // Discrete Telemetry Badges
+        tempStations.forEach(s => {
             const labelIcon = L.divIcon({
                 className: 'temp-label-box',
-                html: `<div class="temp-label">${l.text}</div>`
+                html: `<div class="temp-badge">${s.name} <b>${s.temp}°C</b></div>`
             });
-            L.marker(l.pos, { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
+            L.marker([s.lat, s.lng], { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
         });
 
         // 5. Wind Radar
@@ -463,14 +511,17 @@
         function toggleRadar(key) {
             const item = radars[key];
             const el = document.getElementById(item.btn);
+            const legend = document.getElementById('temp-legend');
             if (item.active) {
                 map.removeLayer(item.layer);
                 item.active = false;
                 el.classList.remove('active');
+                if (key === 'temp') legend.style.display = 'none';
             } else {
                 item.layer.addTo(map);
                 item.active = true;
                 el.classList.add('active');
+                if (key === 'temp') legend.style.display = 'block';
             }
         }
     </script>
