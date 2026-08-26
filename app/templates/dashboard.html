@@ -51,7 +51,7 @@
             font-weight: 800;
             color: #ffffff;
             background: rgba(15, 23, 42, 0.85);
-            padding: 2px 7px;
+            padding: 3px 8px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 2px 6px rgba(0,0,0,0.8);
@@ -61,10 +61,10 @@
             position: absolute;
             bottom: 24px;
             right: 24px;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.92);
             border: 1px solid rgba(255,255,255,0.2);
             backdrop-filter: blur(8px);
-            padding: 8px 14px;
+            padding: 10px 14px;
             border-radius: 10px;
             z-index: 1000;
             display: none;
@@ -127,7 +127,7 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Switcher Buttons -->
+                <!-- Radar Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -159,7 +159,7 @@
                 </div>
             </div>
 
-            <!-- Scrollable Bulletins Feed -->
+            <!-- Bulletins Feed -->
             <div class="p-3 border-t border-white/10 bg-black/30 flex flex-col max-h-52 overflow-y-auto">
                 <div class="flex items-center justify-between text-white font-semibold text-xs mb-2">
                     <span class="flex items-center gap-1.5">
@@ -189,16 +189,14 @@
         <!-- Right Side: Map Canvas -->
         <main class="flex-1 relative">
             <div id="map"></div>
-            <!-- Temperature Thermal Scale Legend -->
+            <!-- Temperature Choropleth Legend -->
             <div id="temp-legend">
-                <div class="text-[11px] font-bold text-white mb-1">Temperature Field (°C)</div>
-                <div class="h-3 w-48 rounded" style="background: linear-gradient(to right, #1d4ed8 0%, #06b6d4 25%, #22c55e 50%, #eab308 70%, #ea580c 85%, #dc2626 100%);"></div>
-                <div class="flex justify-between text-[10px] text-slate-300 mt-1 font-semibold">
-                    <span>10°C</span>
-                    <span>18°C</span>
-                    <span>24°C</span>
-                    <span>30°C</span>
-                    <span>36°C+</span>
+                <div class="text-[11px] font-bold text-white mb-1.5">State Thermal Profile (°C)</div>
+                <div class="space-y-1 text-[10px]">
+                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-blue-600 inline-block"></span> <span>Cold Alpine (&lt; 16°C)</span></div>
+                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-emerald-500 inline-block"></span> <span>Temperate Plateau (18-22°C)</span></div>
+                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-amber-500 inline-block"></span> <span>Sub-Tropical Hill (23-28°C)</span></div>
+                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-red-600 inline-block"></span> <span>Warm Plains (30-35°C)</span></div>
                 </div>
             </div>
         </main>
@@ -303,7 +301,7 @@
         // Initialize Map
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
 
-        // ESRI Base Map
+        // ESRI Dark Gray Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             attribution: 'Tiles &copy; Esri'
@@ -376,88 +374,135 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. METEOROLOGICAL TOPOGRAPHICAL TEMPERATURE CANVAS ENGINE
+        // 4. PRECISE STATE-BY-STATE BOUNDARY TEMPERATURE FILL (CHOROPLETH)
         const tempRadarLayer = L.layerGroup();
 
-        // High-Precision NER Observation Network
-        const tempStations = [
-            { lat: 27.58, lng: 91.86, temp: 11, name: "Tawang" },
-            { lat: 27.70, lng: 88.70, temp: 9, name: "North Sikkim" },
-            { lat: 27.33, lng: 88.61, temp: 16, name: "Gangtok" },
-            { lat: 28.15, lng: 94.60, temp: 14, name: "Upper Siang" },
-            { lat: 25.57, lng: 91.89, temp: 19, name: "Shillong" },
-            { lat: 25.67, lng: 94.10, temp: 22, name: "Kohima" },
-            { lat: 23.72, lng: 92.71, temp: 24, name: "Aizawl" },
-            { lat: 25.18, lng: 93.02, temp: 26, name: "Haflong" },
-            { lat: 27.10, lng: 93.62, temp: 27, name: "Itanagar" },
-            { lat: 24.81, lng: 93.93, temp: 28, name: "Imphal" },
-            { lat: 27.47, lng: 94.91, temp: 31, name: "Dibrugarh" },
-            { lat: 26.65, lng: 92.80, temp: 32, name: "Tezpur" },
-            { lat: 26.18, lng: 91.75, temp: 33, name: "Guwahati" },
-            { lat: 23.83, lng: 91.28, temp: 34, name: "Agartala" },
-            { lat: 24.83, lng: 92.77, temp: 32, name: "Silchar" }
+        // All 8 Northeast States Geometrical Boundaries with Accurate Regional Profiles
+        const statePolygons = [
+            {
+                name: "Sikkim",
+                temp: "16°C",
+                type: "Alpine / Sub-Alpine Ridge",
+                color: "#2563eb", // Cold Deep Blue
+                center: [27.53, 88.51],
+                coords: [
+                    [28.13, 88.08], [28.10, 88.85], [27.78, 88.92], 
+                    [27.18, 88.75], [27.08, 88.55], [27.15, 88.10], [27.80, 88.02]
+                ]
+            },
+            {
+                name: "Arunachal Pradesh",
+                temp: "14°C (Tawang 11°C)",
+                type: "High Himalayan Cryo-Zone",
+                color: "#0284c7", // Cool Ocean Blue
+                center: [28.21, 94.72],
+                coords: [
+                    [27.50, 91.60], [28.00, 91.80], [28.60, 93.50], [29.30, 95.00], 
+                    [28.80, 96.50], [28.20, 97.40], [27.00, 96.80], [26.85, 95.50], 
+                    [27.10, 93.60], [26.90, 92.10]
+                ]
+            },
+            {
+                name: "Assam",
+                temp: "33°C (Guwahati 33°C)",
+                type: "Warm Brahmaputra River Basin",
+                color: "#ea580c", // Warm Red-Orange
+                center: [26.20, 92.93],
+                coords: [
+                    [26.90, 89.90], [26.95, 93.50], [27.80, 95.50], [27.30, 96.00], 
+                    [26.50, 95.00], [26.20, 93.80], [25.50, 93.20], [24.70, 93.00], 
+                    [24.50, 92.50], [25.10, 92.60], [25.80, 91.50], [26.00, 89.80]
+                ]
+            },
+            {
+                name: "Meghalaya",
+                temp: "19°C (Shillong 19°C)",
+                type: "Temperate High Plateau",
+                color: "#16a34a", // Emerald Green
+                center: [25.50, 91.30],
+                coords: [
+                    [26.00, 89.80], [26.10, 92.40], [25.60, 92.80], 
+                    [25.10, 92.60], [25.15, 90.00], [25.60, 89.80]
+                ]
+            },
+            {
+                name: "Nagaland",
+                temp: "22°C (Kohima 22°C)",
+                type: "Sub-Tropical High Ridge",
+                color: "#65a30d", // Lime Green
+                center: [26.15, 94.56],
+                coords: [
+                    [26.85, 95.50], [27.00, 95.10], [26.20, 94.20], 
+                    [25.50, 93.50], [25.60, 94.50], [26.40, 95.20]
+                ]
+            },
+            {
+                name: "Manipur",
+                temp: "28°C (Imphal 28°C)",
+                type: "Sub-Tropical Enclosed Valley",
+                color: "#eab308", // Yellow
+                center: [24.66, 93.90],
+                coords: [
+                    [25.60, 94.50], [25.50, 93.50], [24.50, 93.00], 
+                    [23.90, 93.20], [24.20, 94.50], [25.00, 94.60]
+                ]
+            },
+            {
+                name: "Mizoram",
+                temp: "24°C (Aizawl 24°C)",
+                type: "Hilly Ridge Corridor",
+                color: "#d97706", // Amber
+                center: [23.16, 92.93],
+                coords: [
+                    [24.50, 93.00], [24.30, 92.30], [23.00, 92.20], 
+                    [22.00, 92.80], [22.40, 93.20], [23.90, 93.20]
+                ]
+            },
+            {
+                name: "Tripura",
+                temp: "34°C (Agartala 34°C)",
+                type: "Tropical Lowland Basin",
+                color: "#dc2626", // Crimson Red
+                center: [23.83, 91.50],
+                coords: [
+                    [24.50, 92.00], [24.50, 92.30], [23.70, 92.30], 
+                    [23.00, 91.80], [23.20, 91.20], [24.20, 91.30]
+                ]
+            }
         ];
 
-        // Inverse Distance Weighting (IDW) Thermal Color Interpolator
-        function getThermalColor(t) {
-            // Weather&Radar standard palette (10°C to 36°C)
-            if (t <= 12) return [29, 78, 216, 0.65];   // Deep Blue (#1d4ed8)
-            if (t <= 16) return [6, 182, 212, 0.65];   // Cyan (#06b6d4)
-            if (t <= 22) return [34, 197, 94, 0.60];   // Emerald Green (#22c55e)
-            if (t <= 26) return [234, 179, 8, 0.60];   // Yellow (#eab308)
-            if (t <= 30) return [249, 115, 22, 0.65];  // Warm Orange (#f97316)
-            return [220, 38, 38, 0.70];                // Crimson Red (#dc2626)
-        }
+        // Draw Crisp State Polygons with Temperature Fills
+        statePolygons.forEach(st => {
+            const polygon = L.polygon(st.coords, {
+                color: '#ffffff',
+                weight: 1.5,
+                opacity: 0.9,
+                fillColor: st.color,
+                fillOpacity: 0.55
+            }).addTo(tempRadarLayer);
 
-        function drawThermalCanvas() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 280;
-            canvas.height = 240;
-            const ctx = canvas.getContext('2d');
-            const imgData = ctx.createImageData(canvas.width, canvas.height);
+            polygon.bindPopup(`
+                <div style="font-size:12px;">
+                    <b style="color:${st.color}; font-size:14px;">${st.name}</b><br>
+                    <span>Average Temp: <b>${st.temp}</b></span><br>
+                    <span>Terrain: <i>${st.type}</i></span>
+                </div>
+            `);
 
-            const minLat = 22.0, maxLat = 29.5;
-            const minLng = 87.5, maxLng = 97.5;
-
-            for (let y = 0; y < canvas.height; y++) {
-                const lat = maxLat - (y / canvas.height) * (maxLat - minLat);
-                for (let x = 0; x < canvas.width; x++) {
-                    const lng = minLng + (x / canvas.width) * (maxLng - minLng);
-
-                    let num = 0, den = 0;
-                    for (let s of tempStations) {
-                        const d2 = Math.pow(lat - s.lat, 2) + Math.pow(lng - s.lng, 2) + 0.001;
-                        const w = 1 / Math.pow(d2, 1.4);
-                        num += s.temp * w;
-                        den += w;
-                    }
-                    const interpolatedTemp = num / den;
-                    const color = getThermalColor(interpolatedTemp);
-
-                    const idx = (y * canvas.width + x) * 4;
-                    imgData.data[idx] = color[0];
-                    imgData.data[idx + 1] = color[1];
-                    imgData.data[idx + 2] = color[2];
-                    imgData.data[idx + 3] = Math.floor(color[3] * 255);
-                }
-            }
-            ctx.putImageData(imgData, 0, 0);
-            return canvas.toDataURL();
-        }
-
-        const thermalBounds = [[22.0, 87.5], [29.5, 97.5]];
-        L.imageOverlay(drawThermalCanvas(), thermalBounds, {
-            opacity: 0.85,
-            zIndex: 350
-        }).addTo(tempRadarLayer);
-
-        // Discrete Telemetry Badges
-        tempStations.forEach(s => {
-            const labelIcon = L.divIcon({
-                className: 'temp-label-box',
-                html: `<div class="temp-badge">${s.name} <b>${s.temp}°C</b></div>`
+            // Interactive hover effect
+            polygon.on('mouseover', function () {
+                this.setStyle({ fillOpacity: 0.8, weight: 2.5 });
             });
-            L.marker([s.lat, s.lng], { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
+            polygon.on('mouseout', function () {
+                this.setStyle({ fillOpacity: 0.55, weight: 1.5 });
+            });
+
+            // Badge Marker at state center
+            const badgeIcon = L.divIcon({
+                className: 'temp-badge-box',
+                html: `<div class="temp-badge">${st.name}: <b>${st.temp}</b></div>`
+            });
+            L.marker(st.center, { icon: badgeIcon }).addTo(tempRadarLayer);
         });
 
         // 5. Wind Radar
