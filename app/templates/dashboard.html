@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Smooth Dynamic Heatmap Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <style>
         #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0b111e; }
         .sidebar-bg {
@@ -38,19 +40,6 @@
             align-items: center;
             gap: 4px;
         }
-        .temp-badge {
-            background: linear-gradient(135deg, #ef4444, #f97316);
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-            border: 1px solid #ffffff;
-        }
-        .temp-badge-cool {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-        }
         .pulse-cell {
             animation: pulse-ring 1.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
@@ -58,6 +47,14 @@
             0% { transform: scale(0.9); opacity: 1; }
             50% { transform: scale(1.4); opacity: 0.5; }
             100% { transform: scale(0.9); opacity: 1; }
+        }
+        /* Discrete small subtle temperature labels */
+        .temp-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px #000;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -117,6 +114,7 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
+                <!-- Radar Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -276,7 +274,7 @@
             document.getElementById('t-weather-news').innerText = t.weatherNews;
         }
 
-        // Initialize Map with ESRI Dark Canvas (No Watermarks, High Res Zoom)
+        // Initialize Map
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
 
         // ESRI Dark Gray Base Layer
@@ -285,7 +283,6 @@
             attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
         }).addTo(map);
 
-        // ESRI Reference Labels Layer
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             zIndex: 400
@@ -328,7 +325,7 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. Safe Auto-Scaled Rain Radar Layer (Strict native bounds)
+        // 2. Rain Radar Layer
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -345,7 +342,7 @@
                 }
             }).catch(() => {});
 
-        // 3. Weather / Cloud Overlay
+        // 3. Cloud / Weather Overlay
         const weatherRadarLayer = L.layerGroup();
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
@@ -357,27 +354,59 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. Temperature Radar
+        // 4. CONTINUOUS SYNTHETIC THERMAL HEATMAP (Like Weather&Radar)
         const tempRadarLayer = L.layerGroup();
-        const tempStations = [
-            { pos: [26.18, 91.75], name: "Guwahati (Assam)", temp: "33°C", cool: false },
-            { pos: [27.33, 88.61], name: "Gangtok (Sikkim)", temp: "16°C", cool: true },
-            { pos: [25.57, 91.89], name: "Shillong (Meghalaya)", temp: "19°C", cool: true },
-            { pos: [25.67, 94.10], name: "Kohima (Nagaland)", temp: "22°C", cool: true },
-            { pos: [24.81, 93.93], name: "Imphal (Manipur)", temp: "28°C", cool: false },
-            { pos: [23.72, 92.71], name: "Aizawl (Mizoram)", temp: "24°C", cool: true },
-            { pos: [23.83, 91.28], name: "Agartala (Tripura)", temp: "34°C", cool: false },
-            { pos: [27.10, 93.62], name: "Itanagar (Arunachal)", temp: "27°C", cool: false },
-            { pos: [27.58, 91.86], name: "Tawang (Arunachal)", temp: "11°C", cool: true },
-            { pos: [25.18, 93.02], name: "Haflong (Assam)", temp: "26°C", cool: false }
+        
+        // Heatmap Matrix Points [Lat, Lng, Intensity (0.0 to 1.0)]
+        const thermalGrid = [
+            // Cool Himalayan Ridges (Blue/Cyan ~10-18°C)
+            [27.58, 91.86, 0.15], [27.70, 88.70, 0.10], [27.33, 88.61, 0.25], 
+            [28.00, 93.50, 0.20], [28.30, 94.50, 0.20], [27.90, 95.50, 0.18],
+
+            // Mild Highland Valleys (Green/Yellow ~19-25°C)
+            [25.57, 91.89, 0.40], [25.67, 94.10, 0.45], [23.72, 92.71, 0.50],
+            [25.18, 93.02, 0.55], [24.81, 93.93, 0.60], [27.10, 93.62, 0.58],
+
+            // Warm River Plains & Lowlands (Orange/Red ~28-35°C)
+            [26.18, 91.75, 0.88], [26.50, 92.50, 0.85], [26.70, 93.80, 0.82],
+            [27.47, 94.91, 0.80], [23.83, 91.28, 0.95], [24.50, 92.00, 0.88],
+            [25.00, 91.00, 0.85], [26.00, 90.00, 0.89], [25.80, 93.50, 0.78]
         ];
-        tempStations.forEach(s => {
-            const badgeClass = s.cool ? "temp-badge temp-badge-cool" : "temp-badge";
-            const tempIcon = L.divIcon({
-                className: 'temp-pin',
-                html: `<div class="${badgeClass}">${s.name} ${s.temp}</div>`
+
+        // Smooth Blending Heatmap Engine
+        L.heatLayer(thermalGrid, {
+            radius: 80,
+            blur: 50,
+            maxZoom: 12,
+            max: 1.0,
+            gradient: {
+                0.1: '#3b82f6', // Blue (Cool/Mountains)
+                0.3: '#06b6d4', // Cyan
+                0.5: '#22c55e', // Green (Temperate)
+                0.7: '#eab308', // Yellow
+                0.85: '#f97316',// Orange (Warm)
+                1.0: '#ef4444'  // Red (Hot Plains)
+            }
+        }).addTo(tempRadarLayer);
+
+        // Minimalist Weather Text Labels (No ugly pins or rods)
+        const tempTextLabels = [
+            { pos: [26.18, 91.75], text: "Guwahati 33°" },
+            { pos: [27.33, 88.61], text: "Gangtok 16°" },
+            { pos: [25.57, 91.89], text: "Shillong 19°" },
+            { pos: [25.67, 94.10], text: "Kohima 22°" },
+            { pos: [24.81, 93.93], text: "Imphal 28°" },
+            { pos: [23.72, 92.71], text: "Aizawl 24°" },
+            { pos: [23.83, 91.28], text: "Agartala 34°" },
+            { pos: [27.58, 91.86], text: "Tawang 11°" }
+        ];
+
+        tempTextLabels.forEach(l => {
+            const labelIcon = L.divIcon({
+                className: 'temp-label',
+                html: `<div>${l.text}</div>`
             });
-            L.marker(s.pos, { icon: tempIcon }).addTo(tempRadarLayer);
+            L.marker(l.pos, { icon: labelIcon }).addTo(tempRadarLayer);
         });
 
         // 5. Wind Radar
