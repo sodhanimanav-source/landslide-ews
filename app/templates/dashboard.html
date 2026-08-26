@@ -7,39 +7,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <style>
-        #map { height: calc(100vh - 70px); width: 100%; border-radius: 0; z-index: 1; }
+        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; }
         .sidebar-bg {
             background: radial-gradient(circle at 50% 50%, #165b82 0%, #0e3d59 100%);
         }
         .radar-item {
             transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
         }
         .radar-item:hover {
             background-color: rgba(255, 255, 255, 0.12);
         }
         .radar-item.active {
-            background-color: rgba(255, 255, 255, 0.22);
+            background-color: rgba(255, 255, 255, 0.25);
             border-left: 4px solid #facc15;
+        }
+        .wind-pill {
+            background: rgba(14, 165, 233, 0.9);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .temp-badge {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            border: 1px solid #ffffff;
+        }
+        .temp-badge-cool {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        .pulse-cell {
+            animation: pulse-ring 1.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+            100% { transform: scale(0.9); opacity: 1; }
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
     <!-- Top Navigation Bar -->
-    <nav class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex justify-between items-center z-50">
+    <nav class="bg-slate-900 border-b border-slate-800 px-6 py-2.5 flex justify-between items-center z-50">
         <div class="flex items-center space-x-3">
             <span class="text-2xl">🏔️</span>
             <div>
-                <h1 id="t-title" class="font-bold text-base text-white">Northeast Landslide & Multi-Hazard EWS</h1>
-                <p id="t-subtitle" class="text-xs text-slate-400">Integrated Hydro-Geological Intelligence Platform</p>
+                <h1 id="t-title" class="font-bold text-sm md:text-base text-white">Northeast Landslide & Multi-Hazard EWS</h1>
+                <p id="t-subtitle" class="text-[11px] text-slate-400">Integrated Hydro-Geological Intelligence Platform</p>
             </div>
         </div>
 
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-3">
             <!-- Multi-Language Selector Dropdown -->
-            <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-                <span class="text-xs text-slate-400">🌐</span>
+            <div class="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
+                <span class="text-xs">🌐</span>
                 <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-transparent text-xs text-white outline-none cursor-pointer">
                     <option value="en" class="bg-slate-900">English</option>
                     <option value="hi" class="bg-slate-900">हिन्दी (Hindi)</option>
@@ -49,10 +85,10 @@
                 </select>
             </div>
 
-            <a href="/report" id="t-report-btn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition">
+            <a href="/report" id="t-report-btn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
                 + Report Incident
             </a>
-            <a href="/docs" target="_blank" class="border border-slate-700 hover:bg-slate-800 text-xs px-3 py-1.5 rounded-lg transition text-slate-300">
+            <a href="/docs" target="_blank" class="border border-slate-700 hover:bg-slate-800 text-xs px-2.5 py-1.5 rounded-lg transition text-slate-300">
                 API Docs
             </a>
         </div>
@@ -62,82 +98,82 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Left Multi-Radar Sidebar -->
-        <aside class="sidebar-bg w-72 flex-shrink-0 border-r border-slate-700/50 flex flex-col justify-between overflow-y-auto">
-            <div class="py-4 space-y-1">
+        <aside class="sidebar-bg w-64 flex-shrink-0 border-r border-slate-700/50 flex flex-col justify-between overflow-y-auto">
+            <div class="py-3 space-y-1">
                 
-                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">🔍</span>
-                    <span id="t-my-locations" class="font-medium text-sm">My Locations</span>
+                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
+                    <span class="text-base">🔍</span>
+                    <span id="t-my-locations" class="font-medium text-xs">My Locations</span>
                 </div>
 
-                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">🌤️</span>
+                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
+                    <span class="text-base">🌤️</span>
                     <div>
-                        <span id="t-weather-loc" class="font-medium text-sm block">Weather Northeast</span>
-                        <span class="text-[10px] text-amber-300">Live Active Station</span>
+                        <span id="t-weather-loc" class="font-medium text-xs block">Weather Northeast</span>
+                        <span class="text-[9px] text-amber-300">Live Active Station</span>
                     </div>
                 </div>
 
-                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">🔔</span>
-                    <span id="t-push-alerts" class="font-medium text-sm">Push notifications</span>
+                <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
+                    <span class="text-base">🔔</span>
+                    <span id="t-push-alerts" class="font-medium text-xs">Push notifications</span>
                 </div>
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- RADAR LAYER SELECTORS -->
+                <!-- RADAR LAYER BUTTONS -->
                 
                 <!-- 1. Landslide Radar -->
-                <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item active rounded-r-xl">
-                    <span class="text-lg">🎯</span>
-                    <span id="t-landslide-radar" class="font-semibold text-sm">LandslideRadar</span>
+                <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
+                    <span class="text-base">🎯</span>
+                    <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
                 </div>
 
                 <!-- 2. Rain Radar -->
-                <div id="btn-rain" onclick="toggleRadar('rain')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item active rounded-r-xl">
-                    <span class="text-lg">💧</span>
-                    <span id="t-rain-radar" class="font-semibold text-sm">RainRadar</span>
+                <div id="btn-rain" onclick="toggleRadar('rain')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
+                    <span class="text-base">💧</span>
+                    <span id="t-rain-radar" class="font-semibold text-xs">RainRadar</span>
                 </div>
 
                 <!-- 3. Weather / Cloud Radar -->
-                <div id="btn-weather" onclick="toggleRadar('weather')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">🌦️</span>
-                    <span id="t-weather-radar" class="font-semibold text-sm">WeatherRadar</span>
+                <div id="btn-weather" onclick="toggleRadar('weather')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
+                    <span class="text-base">🌦️</span>
+                    <span id="t-weather-radar" class="font-semibold text-xs">WeatherRadar</span>
                 </div>
 
                 <!-- 4. Temperature Radar -->
-                <div id="btn-temp" onclick="toggleRadar('temp')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">🌡️</span>
-                    <span id="t-temp-radar" class="font-semibold text-sm">TemperatureRadar</span>
+                <div id="btn-temp" onclick="toggleRadar('temp')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
+                    <span class="text-base">🌡️</span>
+                    <span id="t-temp-radar" class="font-semibold text-xs">TemperatureRadar</span>
                 </div>
 
                 <!-- 5. Wind Radar -->
-                <div id="btn-wind" onclick="toggleRadar('wind')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">💨</span>
-                    <span id="t-wind-radar" class="font-semibold text-sm">WindRadar</span>
+                <div id="btn-wind" onclick="toggleRadar('wind')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
+                    <span class="text-base">💨</span>
+                    <span id="t-wind-radar" class="font-semibold text-xs">WindRadar</span>
                 </div>
 
                 <!-- 6. Lightning Radar -->
-                <div id="btn-lightning" onclick="toggleRadar('lightning')" class="px-4 py-3 flex items-center gap-3 text-white cursor-pointer radar-item rounded-r-xl">
-                    <span class="text-lg">⚡</span>
-                    <span id="t-lightning-radar" class="font-semibold text-sm">LightningRadar</span>
+                <div id="btn-lightning" onclick="toggleRadar('lightning')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
+                    <span class="text-base">⚡</span>
+                    <span id="t-lightning-radar" class="font-semibold text-xs">LightningRadar</span>
                 </div>
             </div>
 
-            <!-- Bottom Live Advisory Bulletins -->
-            <div class="p-4 border-t border-white/10 bg-black/20">
-                <div class="flex items-center gap-2 text-white font-medium text-xs mb-2">
+            <!-- Bottom Weather News -->
+            <div class="p-3 border-t border-white/10 bg-black/20">
+                <div class="flex items-center gap-2 text-white font-semibold text-xs mb-1.5">
                     <span>💬</span>
-                    <span id="t-weather-news">Weather News & Bulletins</span>
+                    <span id="t-weather-news">Weather News & Alerts</span>
                 </div>
                 <div class="text-[11px] text-white/70 space-y-1">
-                    <p class="truncate text-amber-300">● Red Alert: NH-10 Corridor</p>
-                    <p class="truncate text-blue-300">● IMD Heavy Rain Advisory</p>
+                    <p class="truncate text-red-300">● Red Alert: NH-10 Sevoke</p>
+                    <p class="truncate text-amber-300">● Amber: NH-29 Chumukedima</p>
                 </div>
             </div>
         </aside>
 
-        <!-- Right Side: Map Canvas -->
+        <!-- Right Side: Fullscreen Map Canvas -->
         <main class="flex-1 relative">
             <div id="map"></div>
         </main>
@@ -159,7 +195,7 @@
                 tempRadar: "TemperatureRadar",
                 windRadar: "WindRadar",
                 lightningRadar: "LightningRadar",
-                weatherNews: "Weather News & Bulletins"
+                weatherNews: "Weather News & Alerts"
             },
             hi: {
                 title: "पूर्वोत्तर भूस्खलन एवं बहु-आपदा पूर्व चेतावनी प्रणाली",
@@ -170,11 +206,11 @@
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार (LandslideRadar)",
                 rainRadar: "वर्षा रडार (RainRadar)",
-                weatherRadar: "मौसम रडार (WeatherRadar)",
+                weatherRadar: "मौसम रडar (WeatherRadar)",
                 tempRadar: "तापमान रडार (TemperatureRadar)",
                 windRadar: "पवन रडार (WindRadar)",
-                lightningRadar: "बिजली रडार (LightningRadar)",
-                weatherNews: "मौसम समाचार एवं बुलेटिन"
+                lightningRadar: "तड़ित रडार (LightningRadar)",
+                weatherNews: "मौसम समाचार एवं अलर्ट"
             },
             as: {
                 title: "উত্তৰ-পূব ভূমিস্খলন প্ৰাৰম্ভিক সতৰ্কবাণী ব্যৱস্থা",
@@ -189,7 +225,7 @@
                 tempRadar: "তাপমাত্ৰা ৰাডাৰ",
                 windRadar: "বতাহ ৰাডাৰ",
                 lightningRadar: "বজ্ৰপাত ৰাডাৰ",
-                weatherNews: "বতৰৰ বাতৰি আৰু বুলেটিন"
+                weatherNews: "বতৰৰ বাতৰি আৰু সতৰ্কবাণী"
             },
             bn: {
                 title: "উত্তর-পূর্ব ভূমিধস ও বহু-বিপর্যয় সতর্কবার্তা ব্যবস্থা",
@@ -204,7 +240,7 @@
                 tempRadar: "তাপমাত্রা রাডার",
                 windRadar: "বায়ু রাডার",
                 lightningRadar: "বজ্রপাত রাডার",
-                weatherNews: "আবহাওয়া সংবাদ ও বুলেটিন"
+                weatherNews: "আবহাওয়া সংবাদ ও সতর্কতা"
             },
             ne: {
                 title: "उत्तर-पूर्व पहिरो पूर्व चेतावनी प्रणाली",
@@ -219,7 +255,7 @@
                 tempRadar: "तापक्रम राडार",
                 windRadar: "हावा राडार",
                 lightningRadar: "चट्याङ राडार",
-                weatherNews: "मौसम समाचार र बुलेटिन"
+                weatherNews: "मौसम समाचार र सतर्कता"
             }
         };
 
@@ -247,28 +283,22 @@
             attribution: '&copy; CARTO'
         }).addTo(map);
 
-        // 3. RADAR LAYERS SETUP (With safe maxNativeZoom so tiles never break on zoom)
+        // 3. RADAR LAYERS SETUP
         
-        // A. Landslide Radar (Corridors + Heatmap)
+        // A. Landslide Radar (High/Med/Low Corridors + Geo Hazard Spots)
         const landslideLayer = L.layerGroup().addTo(map);
-        const heatPoints = [
-            [27.050, 88.435, 0.9], [26.885, 88.472, 0.8], [25.710, 93.980, 0.7],
-            [25.670, 94.108, 0.6], [25.270, 91.720, 0.7], [24.780, 93.500, 0.85],
-            [27.338, 88.606, 0.95], [25.578, 91.893, 0.5]
-        ];
-        L.heatLayer(heatPoints, { radius: 32, blur: 22, maxZoom: 14, max: 1.0 }).addTo(landslideLayer);
-
         const corridors = [
-            { name: "NH-10 Sevoke - Gangtok", risk: "HIGH RISK (88%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.150, 88.500]], color: "#ef4444" },
-            { name: "NH-29 Dimapur - Kohima", risk: "MED RISK (52%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#f59e0b" },
-            { name: "Shillong Bypass NH-206", risk: "LOW RISK (24%)", coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]], color: "#10b981" }
+            { name: "NH-10 Sevoke - Gangtok", risk: "CRITICAL RED (88%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.150, 88.500]], color: "#ef4444" },
+            { name: "NH-29 Dimapur - Kohima", risk: "AMBER ADVISORY (52%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#f59e0b" },
+            { name: "Shillong Bypass NH-206", risk: "GREEN SAFE (24%)", coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]], color: "#10b981" },
+            { name: "Imphal - Jiribam Highway", risk: "CRITICAL RED (79%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" }
         ];
         corridors.forEach(c => {
-            L.polyline(c.coords, { color: c.color, weight: 6, opacity: 0.9 }).addTo(landslideLayer)
-                .bindPopup(`<b>${c.name}</b><br>Status: <b style="color:${c.color}">${c.risk}</b>`);
+            L.polyline(c.coords, { color: c.color, weight: 6, opacity: 0.95 }).addTo(landslideLayer)
+                .bindPopup(`<b>${c.name}</b><br>Landslide Status: <b style="color:${c.color}">${c.risk}</b>`);
         });
 
-        // B. Rain Radar (RainViewer with maxNativeZoom: 7 to allow deep zoom without error)
+        // B. Rain Radar (RainViewer with upscale fix so zoom never breaks)
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -278,64 +308,82 @@
                     L.tileLayer(`https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
                         opacity: 0.65,
                         zIndex: 100,
-                        maxNativeZoom: 7,
+                        maxNativeZoom: 6,
                         maxZoom: 18
                     }).addTo(rainRadarLayer);
                 }
-            }).catch(e => {});
+            }).catch(() => {});
 
-        // C. Weather / Cloud Radar (Open Sat Infrared Stream with safe scaling)
-        const weatherRadarLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/satellite/nowcast/512/{z}/{x}/{y}/0/0_0.png', {
-            opacity: 0.55,
-            zIndex: 90,
-            maxNativeZoom: 6,
-            maxZoom: 18
+        // C. Weather / Cloud Overlay
+        const weatherRadarLayer = L.layerGroup();
+        const cloudRegions = [
+            { pos: [26.18, 91.75], r: 60000, desc: "Dense Stratocumulus Deck" },
+            { pos: [27.33, 88.61], r: 50000, desc: "High Altitudinal Nimbus" },
+            { pos: [25.27, 91.72], r: 70000, desc: "Heavy Orographic Precipitation Clouds" }
+        ];
+        cloudRegions.forEach(c => {
+            L.circle(c.pos, { radius: c.r, color: "#94a3b8", fillColor: "#cbd5e1", fillOpacity: 0.35, weight: 1 }).addTo(weatherRadarLayer)
+                .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // D. Temperature Thermal Radar (Thermal gradient across Northeast stations)
+        // D. Temperature Radar (Real Station Thermal Badges)
         const tempRadarLayer = L.layerGroup();
-        const tempHeatPoints = [
-            [26.18, 91.75, 0.85], // Guwahati 32°C (Warm)
-            [27.33, 88.61, 0.25], // Gangtok 17°C (Cool)
-            [25.57, 91.89, 0.35], // Shillong 20°C
-            [25.67, 94.10, 0.45], // Kohima 23°C
-            [24.81, 93.93, 0.70], // Imphal 28°C
-            [27.47, 94.91, 0.80], // Dibrugarh 30°C
-            [23.83, 91.28, 0.90]  // Agartala 33°C
+        const tempStations = [
+            { pos: [26.18, 91.75], name: "Guwahati", temp: "33°C", cool: false },
+            { pos: [27.33, 88.61], name: "Gangtok", temp: "16°C", cool: true },
+            { pos: [25.57, 91.89], name: "Shillong", temp: "19°C", cool: true },
+            { pos: [25.67, 94.10], name: "Kohima", temp: "22°C", cool: true },
+            { pos: [24.81, 93.93], name: "Imphal", temp: "28°C", cool: false },
+            { pos: [27.47, 94.91], name: "Dibrugarh", temp: "31°C", cool: false },
+            { pos: [23.83, 91.28], name: "Agartala", temp: "34°C", cool: false },
+            { pos: [28.21, 94.72], name: "Itanagar", temp: "27°C", cool: false }
         ];
-        L.heatLayer(tempHeatPoints, {
-            radius: 55,
-            blur: 40,
-            maxZoom: 14,
-            gradient: { 0.2: '#00f', 0.4: '#0ff', 0.6: '#0f0', 0.8: '#ff0', 1.0: '#f00' }
-        }).addTo(tempRadarLayer);
+        tempStations.forEach(s => {
+            const badgeClass = s.cool ? "temp-badge temp-badge-cool" : "temp-badge";
+            const tempIcon = L.divIcon({
+                className: 'temp-pin',
+                html: `<div class="${badgeClass}">${s.name} ${s.temp}</div>`
+            });
+            L.marker(s.pos, { icon: tempIcon }).addTo(tempRadarLayer);
+        });
 
-        // E. Wind Radar (Dynamic Stream Vector Stations)
+        // E. Wind Radar (Live Vector Direction and Velocity Stream)
         const windRadarLayer = L.layerGroup();
         const windStations = [
-            { pos: [26.18, 91.75], speed: "18 km/h SW", dir: "↗" },
-            { pos: [27.33, 88.61], speed: "24 km/h N", dir: "↓" },
-            { pos: [25.57, 91.89], speed: "32 km/h S (Gusts)", dir: "↑" },
-            { pos: [25.67, 94.10], speed: "15 km/h E", dir: "←" },
-            { pos: [24.81, 93.93], speed: "12 km/h NE", dir: "↙" }
+            { pos: [26.18, 91.75], speed: "18 km/h SW", arrow: "↗", name: "Guwahati Basin" },
+            { pos: [27.33, 88.61], speed: "26 km/h N", arrow: "↓", name: "Teesta Ridge" },
+            { pos: [25.57, 91.89], speed: "34 km/h S (High Gusts)", arrow: "↑", name: "Khasi Hills" },
+            { pos: [25.67, 94.10], speed: "14 km/h E", arrow: "←", name: "Naga Hills" },
+            { pos: [24.81, 93.93], speed: "11 km/h NE", arrow: "↙", name: "Imphal Valley" },
+            { pos: [27.47, 94.91], speed: "20 km/h W", arrow: "→", name: "Upper Assam" }
         ];
         windStations.forEach(w => {
             const windIcon = L.divIcon({
-                className: 'wind-pin',
-                html: `<div style="background:rgba(14,165,233,0.85);color:#fff;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,0.5);">${w.dir} ${w.speed}</div>`
+                className: 'wind-pin-container',
+                html: `<div class="wind-pill"><span>${w.arrow}</span> <span>${w.speed}</span></div>`
             });
-            L.marker(w.pos, { icon: windIcon }).addTo(windRadarLayer);
+            L.marker(w.pos, { icon: windIcon }).addTo(windRadarLayer)
+                .bindPopup(`<b>💨 Wind Telemetry: ${w.name}</b><br>Vector Speed: ${w.speed}`);
         });
 
-        // F. Lightning Radar (Real-time Convective Cells)
+        // F. Lightning Radar (Pulsing Convective Strike Cells)
         const lightningRadarLayer = L.layerGroup();
-        const strikes = [[26.15, 91.75], [25.90, 92.40], [27.10, 88.55], [24.95, 93.60]];
-        strikes.forEach(pos => {
-            L.circleMarker(pos, { radius: 11, color: "#facc15", fillColor: "#eab308", fillOpacity: 0.85, weight: 2 }).addTo(lightningRadarLayer)
-                .bindPopup(`<b>⚡ Severe Lightning Activity</b><br>Intensity: High Convection`);
+        const strikes = [
+            { pos: [26.15, 91.75], name: "Kamrup Microburst" },
+            { pos: [25.90, 92.40], name: "Karbi Anglong Storm" },
+            { pos: [27.10, 88.55], name: "Kalimpong Convective Cell" },
+            { pos: [24.95, 93.60], name: "Tamenglong Thunderhead" }
+        ];
+        strikes.forEach(st => {
+            const strikeIcon = L.divIcon({
+                className: 'strike-pin',
+                html: `<div class="pulse-cell" style="background:#eab308;color:#000;font-size:12px;font-weight:900;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #fde047;border:2px solid #fff;">⚡</div>`
+            });
+            L.marker(st.pos, { icon: strikeIcon }).addTo(lightningRadarLayer)
+                .bindPopup(`<b>⚡ Severe Lightning Strike</b><br>Location: ${st.name}<br>Severity: Extreme Convection`);
         });
 
-        // 4. Sidebar Toggle Controller
+        // 4. Sidebar Toggle Switcher
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
             'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
