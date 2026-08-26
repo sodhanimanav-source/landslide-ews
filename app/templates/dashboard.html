@@ -3,12 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landslide EWS — Geo-Spatial Surveillance</title>
+    <title>Landslide EWS — Multi-Radar Spatial Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: 600px; width: 100%; border-radius: 0.75rem; }
+        #map { height: 650px; width: 100%; border-radius: 0.75rem; }
+        /* Custom styling for Leaflet Layer Control */
+        .leaflet-control-layers {
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155 !important;
+            border-radius: 0.5rem !important;
+            padding: 8px 12px !important;
+        }
+        .leaflet-control-layers-expanded {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -17,7 +28,7 @@
             <span class="text-2xl">🏔️</span>
             <div>
                 <h1 class="font-bold text-lg text-white">Northeast Landslide Early Warning System</h1>
-                <p class="text-xs text-slate-400">Integrated Hydro-Geological & Spatial Intelligence</p>
+                <p class="text-xs text-slate-400">Live Doppler Weather & Geological Surveillance</p>
             </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -34,7 +45,10 @@
         <!-- Map View -->
         <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col">
             <div class="flex justify-between items-center mb-3">
-                <h2 class="font-semibold text-sm tracking-wide text-slate-300">VULNERABILITY CORRIDOR SURVEILLANCE</h2>
+                <div>
+                    <h2 class="font-semibold text-sm tracking-wide text-slate-300">RADAR & CORRIDOR SURVEILLANCE</h2>
+                    <p class="text-xs text-slate-500">Toggle layers from top-right icon on map</p>
+                </div>
                 <div class="flex items-center space-x-3 text-xs">
                     <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 inline-block mr-1"></span> High</span>
                     <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block mr-1"></span> Medium</span>
@@ -44,28 +58,29 @@
             <div id="map"></div>
         </div>
 
-        <!-- Analytics & Feeds -->
+        <!-- Right Side Panel -->
         <div class="space-y-6">
-            <!-- ML Engine Stats -->
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Geological ML Status</h3>
-                <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800/80">
-                        <p class="text-xs text-slate-400">Model ROC-AUC</p>
-                        <p class="text-xl font-bold text-emerald-400 mt-1">0.934</p>
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Active Radar Feeds</h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
+                        <span class="flex items-center gap-2">🌧️ <b>Rain Radar:</b></span>
+                        <span class="text-emerald-400">Live RainViewer Doppler</span>
                     </div>
-                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800/80">
-                        <p class="text-xs text-slate-400">Antecedent Window</p>
-                        <p class="text-xl font-bold text-blue-400 mt-1">7 Days</p>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
+                        <span class="flex items-center gap-2">💨 <b>Wind / Pressure:</b></span>
+                        <span class="text-cyan-400">OpenWeather Tile Stream</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
+                        <span class="flex items-center gap-2">⚡ <b>Severe Convection:</b></span>
+                        <span class="text-amber-400">Precipitation Intensity</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Monitored Corridors List -->
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Corridor Susceptibility</h3>
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Vulnerable Corridors</h3>
                 <div id="corridor-list" class="space-y-2 text-sm">
-                    <!-- Populated dynamically via JS -->
                     <div class="p-3 bg-slate-900 rounded-lg flex justify-between items-center border border-slate-800">
                         <div>
                             <p class="font-medium">NH-10 (Siliguri - Gangtok)</p>
@@ -83,9 +98,8 @@
                 </div>
             </div>
 
-            <!-- Citizen Crowdsourced Feed -->
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live Hazard Ground Reports</h3>
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live Hazard Feed</h3>
                 <div id="hazard-feed" class="space-y-2 max-h-48 overflow-y-auto text-xs text-slate-400">
                     <p class="p-2 bg-slate-900 rounded border border-slate-800/80">Connecting to telemetry feed...</p>
                 </div>
@@ -94,13 +108,53 @@
     </main>
 
     <script>
-        const map = L.map('map').setView([26.2006, 92.9376], 7);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // 1. Base Dark Map
+        const darkBasemap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             maxZoom: 18
-        }).addTo(map);
+        });
 
-        // High-Risk Highway Corridors GeoJSON Lines/Polygons
+        const satelliteBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri World Imagery',
+            maxZoom: 18
+        });
+
+        const map = L.map('map', {
+            center: [26.2006, 92.9376],
+            zoom: 7,
+            layers: [darkBasemap]
+        });
+
+        // 2. Real-Time Doppler Rain Radar (via RainViewer Open API)
+        const rainRadarLayer = L.layerGroup().addTo(map);
+        fetch('https://api.rainviewer.com/public/weather-maps.json')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+                    const lastFrame = data.radar.past[data.radar.past.length - 1];
+                    const radarTileUrl = `https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`;
+                    L.tileLayer(radarTileUrl, {
+                        opacity: 0.65,
+                        zIndex: 100
+                    }).addTo(rainRadarLayer);
+                }
+            })
+            .catch(err => console.error("RainViewer load error:", err));
+
+        // 3. Clouds & Weather Overlay
+        const cloudsLayer = L.tileLayer('https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=9ece977b31126302ca2da23c72b2ff1c', {
+            opacity: 0.5,
+            zIndex: 90
+        });
+
+        // 4. Wind Stream Overlay
+        const windLayer = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=9ece977b31126302ca2da23c72b2ff1c', {
+            opacity: 0.5,
+            zIndex: 95
+        });
+
+        // 5. Corridor GeoJSON Lines
+        const corridorsLayer = L.layerGroup().addTo(map);
         const corridors = [
             {
                 name: "NH-10 Sevoke - Teesta Corridor",
@@ -126,13 +180,13 @@
             const line = L.polyline(c.coords, {
                 color: c.color,
                 weight: 6,
-                opacity: 0.85
-            }).addTo(map);
-
+                opacity: 0.9
+            }).addTo(corridorsLayer);
             line.bindPopup(`<b>${c.name}</b><br>Susceptibility: <b>${c.risk}</b>`);
         });
 
-        // Fetch Citizen Reports and plot markers
+        // 6. Crowdsourced Hazard Layer
+        const crowdsourceLayer = L.layerGroup().addTo(map);
         fetch('/api/reports')
             .then(res => res.json())
             .then(reports => {
@@ -145,9 +199,9 @@
                         color: '#ffffff',
                         weight: 1.5,
                         fillOpacity: 0.9
-                    }).addTo(map);
+                    }).addTo(crowdsourceLayer);
 
-                    marker.bindPopup(`<b>Crowdsourced Hazard</b><br>${r.description || 'Debris on road'}<br><small>${r.location_name || ''}</small>`);
+                    marker.bindPopup(`<b>Crowdsourced Hazard</b><br>${r.description || 'Debris'}<br><small>${r.location_name || ''}</small>`);
 
                     const div = document.createElement('div');
                     div.className = "p-2.5 bg-slate-900 rounded border border-slate-800 text-slate-300";
@@ -156,6 +210,22 @@
                 });
             })
             .catch(() => {});
+
+        // 7. Leaflet Interactive Layer Control Box
+        const baseMaps = {
+            "Dark Canvas": darkBasemap,
+            "Satellite Imagery": satelliteBasemap
+        };
+
+        const overlayMaps = {
+            "🌧️ Rain Radar (Doppler)": rainRadarLayer,
+            "💨 Wind Dynamics": windLayer,
+            "☁️ Cloud Cover": cloudsLayer,
+            "🛣️ Susceptibility Corridors": corridorsLayer,
+            "📍 Citizen Incident Markers": crowdsourceLayer
+        };
+
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);
     </script>
 </body>
 </html>
