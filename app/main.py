@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -8,7 +9,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Landslide EWS API")
 
+# Ensure static directory exists
+os.makedirs("app/static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 templates = Jinja2Templates(directory="app/templates")
 
 app.include_router(weather.router)
