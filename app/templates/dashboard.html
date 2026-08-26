@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; }
+        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0b111e; }
         .sidebar-bg {
             background: radial-gradient(circle at 50% 50%, #165b82 0%, #0e3d59 100%);
         }
@@ -73,7 +73,6 @@
         </div>
 
         <div class="flex items-center space-x-3">
-            <!-- Language Dropdown -->
             <div class="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
                 <span class="text-xs">🌐</span>
                 <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-transparent text-xs text-white outline-none cursor-pointer">
@@ -94,13 +93,10 @@
         </div>
     </nav>
 
-    <!-- Main Body Container -->
     <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Left Blue Radar Sidebar -->
+        <!-- Left Sidebar -->
         <aside class="sidebar-bg w-72 flex-shrink-0 border-r border-slate-700/50 flex flex-col justify-between overflow-y-auto">
             <div class="py-3 space-y-1">
-                
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
                     <span class="text-base">🔍</span>
                     <span id="t-my-locations" class="font-medium text-xs">All NER States (8 States)</span>
@@ -121,7 +117,6 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -153,7 +148,7 @@
                 </div>
             </div>
 
-            <!-- Complete Scrollable All 8-States Bulletins Feed -->
+            <!-- Bulletins Feed -->
             <div class="p-3 border-t border-white/10 bg-black/30 flex flex-col max-h-52 overflow-y-auto">
                 <div class="flex items-center justify-between text-white font-semibold text-xs mb-2">
                     <span class="flex items-center gap-1.5">
@@ -180,14 +175,12 @@
             </div>
         </aside>
 
-        <!-- Right Side Leaflet Map -->
         <main class="flex-1 relative">
             <div id="map"></div>
         </main>
     </div>
 
     <script>
-        // Multi-Language Dictionary
         const i18n = {
             en: {
                 title: "Northeast Landslide & Multi-Hazard EWS",
@@ -283,14 +276,22 @@
             document.getElementById('t-weather-news').innerText = t.weatherNews;
         }
 
-        // Initialize Map
+        // Initialize Map with ESRI Dark Canvas (No Watermarks, High Res Zoom)
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 18,
-            attribution: '&copy; CARTO'
+
+        // ESRI Dark Gray Base Layer
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16,
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
         }).addTo(map);
 
-        // 1. Full Pan-NER Landslide Hazard Layer
+        // ESRI Reference Labels Layer
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16,
+            zIndex: 400
+        }).addTo(map);
+
+        // 1. Full Pan-NER Landslide Layer
         const landslideLayer = L.layerGroup().addTo(map);
 
         const corridors = [
@@ -327,7 +328,7 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. Rain Radar
+        // 2. Safe Auto-Scaled Rain Radar Layer (Strict native bounds)
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -335,12 +336,16 @@
                 if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
                     const lastFrame = data.radar.past[data.radar.past.length - 1];
                     L.tileLayer(`https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.65, zIndex: 100, maxNativeZoom: 6, maxZoom: 18
+                        opacity: 0.65,
+                        zIndex: 100,
+                        maxNativeZoom: 5,
+                        maxZoom: 18,
+                        tileSize: 256
                     }).addTo(rainRadarLayer);
                 }
             }).catch(() => {});
 
-        // 3. Cloud / Weather Overlay
+        // 3. Weather / Cloud Overlay
         const weatherRadarLayer = L.layerGroup();
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
