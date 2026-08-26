@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Smooth Dynamic Heatmap Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <style>
         #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0b111e; }
@@ -27,7 +26,7 @@
             border-left: 4px solid #facc15;
         }
         .wind-pill {
-            background: rgba(14, 165, 233, 0.9);
+            background: rgba(14, 165, 233, 0.95);
             color: #ffffff;
             font-size: 11px;
             font-weight: 700;
@@ -48,12 +47,15 @@
             50% { transform: scale(1.4); opacity: 0.5; }
             100% { transform: scale(0.9); opacity: 1; }
         }
-        /* Discrete small subtle temperature labels */
         .temp-label {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             color: #ffffff;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px #000;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
             white-space: nowrap;
         }
     </style>
@@ -277,10 +279,10 @@
         // Initialize Map
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
 
-        // ESRI Dark Gray Base Layer
+        // ESRI Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
-            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+            attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
@@ -325,7 +327,7 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. Rain Radar Layer
+        // 2. Rain Radar
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -333,16 +335,12 @@
                 if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
                     const lastFrame = data.radar.past[data.radar.past.length - 1];
                     L.tileLayer(`https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.65,
-                        zIndex: 100,
-                        maxNativeZoom: 5,
-                        maxZoom: 18,
-                        tileSize: 256
+                        opacity: 0.65, zIndex: 100, maxNativeZoom: 5, maxZoom: 18, tileSize: 256
                     }).addTo(rainRadarLayer);
                 }
             }).catch(() => {});
 
-        // 3. Cloud / Weather Overlay
+        // 3. Weather Overlay
         const weatherRadarLayer = L.layerGroup();
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
@@ -354,57 +352,70 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. CONTINUOUS SYNTHETIC THERMAL HEATMAP (Like Weather&Radar)
+        // 4. VIVID FULL-COVERAGE CONTINUOUS THERMAL HEATMAP (Weather&Radar Style)
         const tempRadarLayer = L.layerGroup();
         
-        // Heatmap Matrix Points [Lat, Lng, Intensity (0.0 to 1.0)]
-        const thermalGrid = [
-            // Cool Himalayan Ridges (Blue/Cyan ~10-18°C)
-            [27.58, 91.86, 0.15], [27.70, 88.70, 0.10], [27.33, 88.61, 0.25], 
-            [28.00, 93.50, 0.20], [28.30, 94.50, 0.20], [27.90, 95.50, 0.18],
+        // Generate dense spatial interpolation grid for vibrant continuous color fill
+        const thermalGrid = [];
+        
+        // High Himalayan Cool Zone (Deep Blue / Cyan: 8°C - 16°C)
+        for (let lat = 27.2; lat <= 28.8; lat += 0.25) {
+            for (let lng = 88.0; lng <= 97.0; lng += 0.35) {
+                thermalGrid.push([lat, lng, 0.2]);
+                thermalGrid.push([lat + 0.05, lng + 0.05, 0.25]);
+            }
+        }
+        
+        // Mid Hills & Valley Temperate Zone (Emerald Green / Yellow: 18°C - 25°C)
+        for (let lat = 24.5; lat <= 26.5; lat += 0.25) {
+            for (let lng = 91.5; lng <= 95.5; lng += 0.35) {
+                thermalGrid.push([lat, lng, 0.55]);
+                thermalGrid.push([lat + 0.05, lng + 0.05, 0.60]);
+            }
+        }
 
-            // Mild Highland Valleys (Green/Yellow ~19-25°C)
-            [25.57, 91.89, 0.40], [25.67, 94.10, 0.45], [23.72, 92.71, 0.50],
-            [25.18, 93.02, 0.55], [24.81, 93.93, 0.60], [27.10, 93.62, 0.58],
+        // Lowland River Basins & Plains Hot Zone (Fiery Orange / Crimson Red: 28°C - 35°C)
+        for (let lat = 23.0; lat <= 26.8; lat += 0.25) {
+            for (let lng = 89.0; lng <= 94.0; lng += 0.35) {
+                thermalGrid.push([lat, lng, 0.88]);
+                thermalGrid.push([lat + 0.05, lng + 0.05, 0.95]);
+            }
+        }
 
-            // Warm River Plains & Lowlands (Orange/Red ~28-35°C)
-            [26.18, 91.75, 0.88], [26.50, 92.50, 0.85], [26.70, 93.80, 0.82],
-            [27.47, 94.91, 0.80], [23.83, 91.28, 0.95], [24.50, 92.00, 0.88],
-            [25.00, 91.00, 0.85], [26.00, 90.00, 0.89], [25.80, 93.50, 0.78]
-        ];
-
-        // Smooth Blending Heatmap Engine
+        // Heavy-Intensity Leaflet Heat Layer with 0.85 Vivid Opacity
         L.heatLayer(thermalGrid, {
-            radius: 80,
-            blur: 50,
-            maxZoom: 12,
+            radius: 120,
+            blur: 45,
+            maxZoom: 10,
             max: 1.0,
+            minOpacity: 0.75,
             gradient: {
-                0.1: '#3b82f6', // Blue (Cool/Mountains)
-                0.3: '#06b6d4', // Cyan
-                0.5: '#22c55e', // Green (Temperate)
-                0.7: '#eab308', // Yellow
-                0.85: '#f97316',// Orange (Warm)
-                1.0: '#ef4444'  // Red (Hot Plains)
+                0.15: '#1d4ed8', // Vivid Deep Blue (Cold Mountain Belts)
+                0.35: '#06b6d4', // Bright Cyan (Cool Plateaus)
+                0.55: '#16a34a', // Emerald Green (Temperate Hills)
+                0.70: '#facc15', // Vibrant Sun Yellow (Warm Valleys)
+                0.85: '#ea580c', // Bright Amber Orange (Hot Plains)
+                1.00: '#dc2626'  // Crimson Red (Extreme Heat Zones)
             }
         }).addTo(tempRadarLayer);
 
-        // Minimalist Weather Text Labels (No ugly pins or rods)
+        // Minimalist Temperature Badges
         const tempTextLabels = [
-            { pos: [26.18, 91.75], text: "Guwahati 33°" },
-            { pos: [27.33, 88.61], text: "Gangtok 16°" },
-            { pos: [25.57, 91.89], text: "Shillong 19°" },
-            { pos: [25.67, 94.10], text: "Kohima 22°" },
-            { pos: [24.81, 93.93], text: "Imphal 28°" },
-            { pos: [23.72, 92.71], text: "Aizawl 24°" },
-            { pos: [23.83, 91.28], text: "Agartala 34°" },
-            { pos: [27.58, 91.86], text: "Tawang 11°" }
+            { pos: [26.18, 91.75], text: "Guwahati 33°C" },
+            { pos: [27.33, 88.61], text: "Gangtok 16°C" },
+            { pos: [25.57, 91.89], text: "Shillong 19°C" },
+            { pos: [25.67, 94.10], text: "Kohima 22°C" },
+            { pos: [24.81, 93.93], text: "Imphal 28°C" },
+            { pos: [23.72, 92.71], text: "Aizawl 24°C" },
+            { pos: [23.83, 91.28], text: "Agartala 34°C" },
+            { pos: [27.58, 91.86], text: "Tawang 11°C" },
+            { pos: [27.47, 94.91], text: "Dibrugarh 31°C" }
         ];
 
         tempTextLabels.forEach(l => {
             const labelIcon = L.divIcon({
-                className: 'temp-label',
-                html: `<div>${l.text}</div>`
+                className: 'temp-label-box',
+                html: `<div class="temp-label">${l.text}</div>`
             });
             L.marker(l.pos, { icon: labelIcon }).addTo(tempRadarLayer);
         });
