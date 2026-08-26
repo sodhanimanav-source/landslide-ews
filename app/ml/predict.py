@@ -1,32 +1,46 @@
-import joblib
 import os
+import joblib
 import numpy as np
 
 model_path = os.path.join(os.path.dirname(__file__), "model.joblib")
 
-# Agar model file nahi hai, toh auto-train karke generate karein
 if not os.path.exists(model_path):
-    from sklearn.ensemble import RandomForestClassifier
-    import pandas as pd
-
-    np.random.seed(42)
-    n = 500
-    slope = np.random.uniform(5, 60, n)
-    elevation = np.random.uniform(200, 3000, n)
-    rainfall = np.random.uniform(0, 250, n)
-    dist_road = np.random.uniform(10, 500, n)
-    label = ((slope * 0.4) + (rainfall * 0.5) - (dist_road * 0.05) > 45).astype(int)
-
-    clf = RandomForestClassifier(n_estimators=50, random_state=42)
-    clf.fit(np.column_stack([slope, elevation, rainfall, dist_road]), label)
-    joblib.dump(clf, model_path)
+    from app.ml.train import train_and_export_model
+    train_and_export_model()
 
 model = joblib.load(model_path)
 
-def predict_landslide_risk(slope: float, elevation: float, rainfall: float, dist_road: float = 100.0) -> dict:
-    features = np.array([[slope, elevation, rainfall, dist_road]])
+def predict_landslide_risk(
+    slope: float,
+    elevation: float,
+    rain_24h: float,
+    rain_7d_antecedent: float = 40.0,
+    soil_moisture: float = 0.45,
+    dist_road: float = 150.0
+) -> dict:
+    features = np.array([[slope, elevation, rain_24h, rain_7d_antecedent, soil_moisture, dist_road]])
     prob = model.predict_proba(features)[0][1]
-    score = int(prob * 100)
+    score = int(round(prob * 100))
     
-    severity = "High" if score >= 70 else "Medium" if score >= 40 else "Low"
-    return {"risk_score": score, "severity": severity}
+    if score >= 70:
+        severity = "High"
+        action = "Issue immediate Red Alert; evacuate vulnerable road stretches."
+    elif score >= 40:
+        severity = "Medium"
+        action = "Issue Amber Advisory; monitor slope displacement and drainage."
+    else:
+        severity = "Low"
+        action = "Green Zone; normal monitoring."
+        
+    return {
+        "risk_score": score,
+        "severity": severity,
+        "recommended_action": action,
+        "factors": {
+            "slope_deg": slope,
+            "elevation_m": elevation,
+            "rain_24h_mm": rain_24h,
+            "rain_7d_api_mm": rain_7d_antecedent,
+            "soil_saturation": soil_moisture
+        }
+    }
