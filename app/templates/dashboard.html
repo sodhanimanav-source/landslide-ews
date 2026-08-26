@@ -72,6 +72,13 @@
             display: none;
             box-shadow: 0 4px 14px rgba(0,0,0,0.7);
         }
+        /* Search Bar Floating Container */
+        #village-search-container {
+            position: absolute;
+            top: 14px;
+            right: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
@@ -162,7 +169,7 @@
                 </div>
             </div>
 
-            <!-- Live Bulletins Feed -->
+            <!-- Bulletins Feed -->
             <div class="p-3 border-t border-white/10 bg-black/30 flex flex-col max-h-52 overflow-y-auto">
                 <div class="flex items-center justify-between text-white font-semibold text-xs mb-2">
                     <span class="flex items-center gap-1.5">
@@ -192,6 +199,12 @@
         <!-- Right Side: Map Canvas -->
         <main class="flex-1 relative">
             <div id="map"></div>
+
+            <!-- Floating Search Any Village / Town in Northeast -->
+            <div id="village-search-container" class="flex items-center gap-1 bg-slate-900/90 border border-slate-700 p-1.5 rounded-lg shadow-xl backdrop-blur-md">
+                <input id="village-search-input" type="text" placeholder="Search any village, town (e.g. Mangan, Noney)..." class="bg-slate-800 text-xs text-white px-3 py-1.5 rounded outline-none border border-slate-600 w-60 md:w-72 focus:border-amber-400 transition" onkeypress="if(event.key==='Enter') searchVillage();" />
+                <button onclick="searchVillage()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
+            </div>
 
             <!-- SatFish Style Floating Calibration Bar -->
             <div id="satfish-legend">
@@ -234,7 +247,7 @@
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार (LandslideRadar)",
                 rainRadar: "वर्षा रडार (RainRadar)",
-                weatherRadar: "मौसम रडार (WeatherRadar)",
+                weatherRadar: "मौसम रडar (WeatherRadar)",
                 tempRadar: "तापमान पूर्वानुमान (Live)",
                 windRadar: "पवन रडार (WindRadar)",
                 lightningRadar: "तड़ित रडार (LightningRadar)",
@@ -304,17 +317,18 @@
             document.getElementById('t-weather-news').innerText = t.weatherNews;
         }
 
-        // Initialize Map
-        const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
+        // Initialize Map with High-Resolution Deep Village Zoom (up to level 19)
+        const map = L.map('map', { maxZoom: 19, minZoom: 5 }).setView([26.15, 93.00], 7);
 
-        // ESRI Base Map
+        // High-Precision Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
+        // Detailed Village & Stream Reference Labels
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 16,
+            maxZoom: 18,
             zIndex: 400
         }).addTo(map);
 
@@ -382,7 +396,6 @@
 
         // 4. REAL-TIME OPEN-METEO WEATHER & FORECASTING ENGINE
         const tempRadarLayer = L.layerGroup();
-        let currentThermalOverlay = null;
         let stationMarkers = [];
 
         const allNerStations = [
@@ -441,12 +454,10 @@
             return "#991b1b";                // Crimson Red
         }
 
-        // Live Open-Meteo Weather Syncer
         async function fetchLiveWeatherData() {
             try {
                 const lats = allNerStations.map(s => s.lat).join(',');
                 const lngs = allNerStations.map(s => s.lng).join(',');
-                
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
                 
                 const res = await fetch(url);
@@ -472,17 +483,15 @@
                     }
                 });
             } catch (err) {
-                console.log("Using cached fallback live model", err);
+                console.log("Using cached live model");
             }
             renderLiveForecastLayers();
         }
 
         function renderLiveForecastLayers() {
-            // Clear existing markers
             stationMarkers.forEach(m => tempRadarLayer.removeLayer(m));
             stationMarkers = [];
 
-            // Add High-Detail Live Station Badges & 3-Day Forecast Popups
             allNerStations.forEach(s => {
                 const hex = getTempColorHex(s.temp);
                 const badgeIcon = L.divIcon({
@@ -526,7 +535,51 @@
             });
         }
 
-        // Live Click-to-Forecast on Any Spot in Northeast
+        // Live Village Search Engine (Nominatim OpenStreetMap)
+        let searchMarker = null;
+        async function searchVillage() {
+            const query = document.getElementById('village-search-input').value.trim();
+            if (!query) return;
+
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ' India')}&limit=1`);
+                const results = await res.json();
+                
+                if (results && results.length > 0) {
+                    const place = results[0];
+                    const lat = parseFloat(place.lat);
+                    const lon = parseFloat(place.lon);
+
+                    map.setView([lat, lon], 13); // Zoom-in deep into the village!
+
+                    if (searchMarker) map.removeLayer(searchMarker);
+
+                    // Fetch live weather for this searched village
+                    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m`);
+                    const wData = await wRes.json();
+                    const t = wData && wData.current ? wData.current.temperature_2m : 22;
+
+                    searchMarker = L.marker([lat, lon])
+                        .addTo(map)
+                        .bindPopup(`
+                            <div style="font-size:12px; color:#fff;">
+                                <b class="text-amber-400 font-bold text-sm">📍 ${place.display_name.split(',')[0]}</b><br>
+                                <span class="text-slate-300 text-xs">${place.display_name}</span><br>
+                                <div class="mt-2 pt-1 border-t border-slate-700 text-xs">
+                                    🌡️ Live Temp: <b>${t}°C</b> | 💧 Rain: <b>${wData.current ? wData.current.precipitation : 0} mm</b>
+                                </div>
+                            </div>
+                        `)
+                        .openPopup();
+                } else {
+                    alert("Location / Village not found in Northeast. Please try nearby town name.");
+                }
+            } catch (err) {
+                alert("Search temporarily offline. Please try again.");
+            }
+        }
+
+        // Click-to-Forecast for any remote mountain / forest coordinate
         map.on('click', async function(e) {
             if (!radars['temp'].active) return;
             const lat = e.latlng.lat;
