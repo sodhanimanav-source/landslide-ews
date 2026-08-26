@@ -8,3 +8,4 @@ requests
 scikit-learn
 joblib
 pandas
+psycopg2-binary
