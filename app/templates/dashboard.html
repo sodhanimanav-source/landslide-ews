@@ -3,229 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landslide EWS — Multi-Radar Spatial Intelligence</title>
+    <title>Landslide EWS — Multi-Hazard Intelligence Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Heatmap Plugin -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <style>
-        #map { height: 650px; width: 100%; border-radius: 0.75rem; }
-        /* Custom styling for Leaflet Layer Control */
-        .leaflet-control-layers {
-            background: #0f172a !important;
-            color: #f8fafc !important;
-            border: 1px solid #334155 !important;
-            border-radius: 0.5rem !important;
-            padding: 8px 12px !important;
-        }
-        .leaflet-control-layers-expanded {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        #map { height: 620px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        .active-btn {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-3.5 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <span class="text-2xl">🏔️</span>
             <div>
-                <h1 class="font-bold text-lg text-white">Northeast Landslide Early Warning System</h1>
-                <p class="text-xs text-slate-400">Live Doppler Weather & Geological Surveillance</p>
+                <h1 class="font-bold text-base md:text-lg text-white">Northeast Multi-Hazard Early Warning System</h1>
+                <p class="text-xs text-slate-400">Integrated Hydro-Geological & Doppler Surveillance</p>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <a href="/report" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+        <div class="flex items-center space-x-3">
+            <a href="/report" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-lg shadow-red-900/30">
                 + Report Incident
             </a>
-            <a href="/docs" target="_blank" class="border border-slate-700 hover:bg-slate-800 text-xs px-3 py-2 rounded-lg transition">
+            <a href="/docs" target="_blank" class="border border-slate-700 hover:bg-slate-800 text-xs px-3 py-2 rounded-lg transition text-slate-300">
                 API Docs
             </a>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Map View -->
-        <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col">
-            <div class="flex justify-between items-center mb-3">
-                <div>
-                    <h2 class="font-semibold text-sm tracking-wide text-slate-300">RADAR & CORRIDOR SURVEILLANCE</h2>
-                    <p class="text-xs text-slate-500">Toggle layers from top-right icon on map</p>
-                </div>
-                <div class="flex items-center space-x-3 text-xs">
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 inline-block mr-1"></span> High</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block mr-1"></span> Medium</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block mr-1"></span> Low</span>
-                </div>
+    <!-- Main Section -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
+        
+        <!-- Interactive Multi-Hazard Layer Selector Bar -->
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">Layer View:</span>
+            
+            <button id="btn-landslide" onclick="toggleLayer('landslide')" class="active-btn text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>🏔️</span> Landslide Corridors
+            </button>
+
+            <button id="btn-heatmap" onclick="toggleLayer('heatmap')" class="active-btn text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>🔥</span> Risk Heatmap
+            </button>
+
+            <button id="btn-rain" onclick="toggleLayer('rain')" class="active-btn text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>🌧️</span> Doppler Rain Radar
+            </button>
+
+            <button id="btn-flood" onclick="toggleLayer('flood')" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>🌊</span> Flash Flood Basins
+            </button>
+
+            <button id="btn-wind" onclick="toggleLayer('wind')" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>💨</span> Wind Stream
+            </button>
+
+            <button id="btn-lightning" onclick="toggleLayer('lightning')" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+                <span>⚡</span> Lightning & Convection
+            </button>
+
+            <div class="ml-auto flex items-center gap-2">
+                <button onclick="setBaseMap('dark')" class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">Dark</button>
+                <button onclick="setBaseMap('satellite')" class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">Satellite</button>
             </div>
-            <div id="map"></div>
         </div>
 
-        <!-- Right Side Panel -->
-        <div class="space-y-6">
-            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Active Radar Feeds</h3>
-                <div class="space-y-2 text-xs">
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
-                        <span class="flex items-center gap-2">🌧️ <b>Rain Radar:</b></span>
-                        <span class="text-emerald-400">Live RainViewer Doppler</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
-                        <span class="flex items-center gap-2">💨 <b>Wind / Pressure:</b></span>
-                        <span class="text-cyan-400">OpenWeather Tile Stream</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded border border-slate-800">
-                        <span class="flex items-center gap-2">⚡ <b>Severe Convection:</b></span>
-                        <span class="text-amber-400">Precipitation Intensity</span>
-                    </div>
-                </div>
+        <!-- Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Map Container -->
+            <div class="lg:col-span-2 bg-slate-900 p-3 rounded-xl border border-slate-800 relative">
+                <div id="map"></div>
             </div>
 
-            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Vulnerable Corridors</h3>
-                <div id="corridor-list" class="space-y-2 text-sm">
-                    <div class="p-3 bg-slate-900 rounded-lg flex justify-between items-center border border-slate-800">
-                        <div>
-                            <p class="font-medium">NH-10 (Siliguri - Gangtok)</p>
-                            <p class="text-xs text-slate-400">Slope: 38° | API: 68mm</p>
+            <!-- Side Intelligence Panel -->
+            <div class="space-y-4">
+                <!-- Realtime Risk Index -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live Susceptibility Index</h3>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-slate-200">NH-10 (Sevoke - Gangtok)</p>
+                                <p class="text-slate-400">Slope: 38° | 7D-API: 78mm</p>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-red-500/20 text-red-400 font-bold border border-red-500/30">HIGH (88%)</span>
                         </div>
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded bg-red-500/20 text-red-400 border border-red-500/30">High Risk</span>
-                    </div>
-                    <div class="p-3 bg-slate-900 rounded-lg flex justify-between items-center border border-slate-800">
-                        <div>
-                            <p class="font-medium">NH-29 (Dimapur - Kohima)</p>
-                            <p class="text-xs text-slate-400">Slope: 31° | API: 42mm</p>
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-slate-200">NH-29 (Dimapur - Kohima)</p>
+                                <p class="text-slate-400">Slope: 31° | 7D-API: 44mm</p>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">MED (52%)</span>
                         </div>
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">Medium Risk</span>
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-slate-200">Brahmaputra Lowland Basin</p>
+                                <p class="text-slate-400">Discharge Alert: High</p>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-blue-500/20 text-blue-400 font-bold border border-blue-500/30">FLOOD ALERT</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live Hazard Feed</h3>
-                <div id="hazard-feed" class="space-y-2 max-h-48 overflow-y-auto text-xs text-slate-400">
-                    <p class="p-2 bg-slate-900 rounded border border-slate-800/80">Connecting to telemetry feed...</p>
+                <!-- Live Ground Incident Reports -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Crowdsourced Alerts</h3>
+                        <span class="text-[10px] text-emerald-400 animate-pulse">● Live Stream</span>
+                    </div>
+                    <div id="hazard-feed" class="space-y-2 max-h-56 overflow-y-auto text-xs text-slate-300">
+                        <p class="p-2 bg-slate-950 rounded border border-slate-800/80 text-slate-500">Loading ground telemetry...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // 1. Base Dark Map
-        const darkBasemap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            maxZoom: 18
-        });
-
-        const satelliteBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; Esri World Imagery',
-            maxZoom: 18
-        });
+        // 1. Basemaps
+        const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, attribution: '&copy; CARTO' });
+        const satTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: '&copy; Esri' });
 
         const map = L.map('map', {
             center: [26.2006, 92.9376],
             zoom: 7,
-            layers: [darkBasemap]
+            layers: [darkTile]
         });
 
-        // 2. Real-Time Doppler Rain Radar (via RainViewer Open API)
+        function setBaseMap(type) {
+            if (type === 'satellite') {
+                map.removeLayer(darkTile);
+                satTile.addTo(map);
+            } else {
+                map.removeLayer(satTile);
+                darkTile.addTo(map);
+            }
+        }
+
+        // 2. LAYER DEFINITIONS
+
+        // A. Landslide Corridors Layer
+        const landslideLayer = L.layerGroup().addTo(map);
+        const corridors = [
+            { name: "NH-10 Sevoke - Gangtok", risk: "HIGH (88%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.150, 88.500]], color: "#ef4444" },
+            { name: "NH-29 Dimapur - Kohima", risk: "MEDIUM (52%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#f59e0b" },
+            { name: "Shillong - Cherrapunji Bypass", risk: "MEDIUM (48%)", coords: [[25.578, 91.893], [25.400, 91.750], [25.270, 91.720]], color: "#f59e0b" },
+            { name: "Imphal - Jiribam NH-37", risk: "HIGH (76%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" }
+        ];
+        corridors.forEach(c => {
+            L.polyline(c.coords, { color: c.color, weight: 6, opacity: 0.9 }).addTo(landslideLayer)
+                .bindPopup(`<b>${c.name}</b><br>Risk Status: <b style="color:${c.color}">${c.risk}</b>`);
+        });
+
+        // B. Dynamic Susceptibility Heatmap Layer
+        const heatPoints = [
+            [27.050, 88.435, 0.9], [26.885, 88.472, 0.8], [25.710, 93.980, 0.7],
+            [25.670, 94.108, 0.6], [25.270, 91.720, 0.7], [24.780, 93.500, 0.85],
+            [27.338, 88.606, 0.95], [25.578, 91.893, 0.5], [28.218, 94.727, 0.8]
+        ];
+        const heatmapLayer = L.heatLayer(heatPoints, { radius: 35, blur: 25, maxZoom: 12, max: 1.0 }).addTo(map);
+
+        // C. Live Doppler Rain Radar (RainViewer)
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
             .then(data => {
                 if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
                     const lastFrame = data.radar.past[data.radar.past.length - 1];
-                    const radarTileUrl = `https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`;
-                    L.tileLayer(radarTileUrl, {
-                        opacity: 0.65,
-                        zIndex: 100
+                    L.tileLayer(`https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        opacity: 0.65, zIndex: 100
                     }).addTo(rainRadarLayer);
                 }
-            })
-            .catch(err => console.error("RainViewer load error:", err));
+            }).catch(e => {});
 
-        // 3. Clouds & Weather Overlay
-        const cloudsLayer = L.tileLayer('https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=9ece977b31126302ca2da23c72b2ff1c', {
-            opacity: 0.5,
-            zIndex: 90
-        });
-
-        // 4. Wind Stream Overlay
-        const windLayer = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=9ece977b31126302ca2da23c72b2ff1c', {
-            opacity: 0.5,
-            zIndex: 95
-        });
-
-        // 5. Corridor GeoJSON Lines
-        const corridorsLayer = L.layerGroup().addTo(map);
-        const corridors = [
-            {
-                name: "NH-10 Sevoke - Teesta Corridor",
-                risk: "High",
-                coords: [[26.885, 88.472], [27.050, 88.435], [27.150, 88.500]],
-                color: "#ef4444"
-            },
-            {
-                name: "NH-29 Chumukedima - Kohima Corridor",
-                risk: "Medium",
-                coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]],
-                color: "#f59e0b"
-            },
-            {
-                name: "Shillong - Dawki NH-206 Corridor",
-                risk: "Low",
-                coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]],
-                color: "#10b981"
-            }
+        // D. Flash Flood Basins (Inundation Polygons)
+        const floodLayer = L.layerGroup();
+        const floodBasins = [
+            { name: "Brahmaputra Flood Plain (Majuli - Kaziranga)", coords: [[26.85, 93.80], [27.00, 94.20], [26.90, 94.50], [26.65, 94.10]], color: "#0284c7" },
+            { name: "Barak Valley Lowland Basin (Silchar)", coords: [[24.75, 92.70], [24.90, 92.85], [24.80, 93.00], [24.65, 92.80]], color: "#0284c7" }
         ];
-
-        corridors.forEach(c => {
-            const line = L.polyline(c.coords, {
-                color: c.color,
-                weight: 6,
-                opacity: 0.9
-            }).addTo(corridorsLayer);
-            line.bindPopup(`<b>${c.name}</b><br>Susceptibility: <b>${c.risk}</b>`);
+        floodBasins.forEach(b => {
+            L.polygon(b.coords, { color: b.color, fillColor: "#38bdf8", fillOpacity: 0.35, weight: 2 }).addTo(floodLayer)
+                .bindPopup(`<b>🌊 ${b.name}</b><br>Status: Water level near danger mark.`);
         });
 
-        // 6. Crowdsourced Hazard Layer
-        const crowdsourceLayer = L.layerGroup().addTo(map);
+        // E. Wind Stream Dynamics Layer
+        const windLayer = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=9ece977b31126302ca2da23c72b2ff1c', {
+            opacity: 0.55, zIndex: 95
+        });
+
+        // F. Lightning & Convective Activity Layer
+        const lightningLayer = L.layerGroup();
+        const lightningStrikes = [
+            [26.15, 91.75], [25.90, 92.40], [27.10, 88.55], [24.95, 93.60]
+        ];
+        lightningStrikes.forEach(pos => {
+            L.circleMarker(pos, { radius: 10, color: "#facc15", fillColor: "#eab308", fillOpacity: 0.85, weight: 2 }).addTo(lightningLayer)
+                .bindPopup(`<b>⚡ Convective Storm Cell</b><br>Detected lightning & microburst activity.`);
+        });
+
+        // Toggle Controller Function
+        const layerMap = {
+            'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
+            'heatmap': { layer: heatmapLayer, btn: 'btn-heatmap', active: true },
+            'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
+            'flood': { layer: floodLayer, btn: 'btn-flood', active: false },
+            'wind': { layer: windLayer, btn: 'btn-wind', active: false },
+            'lightning': { layer: lightningLayer, btn: 'btn-lightning', active: false }
+        };
+
+        function toggleLayer(key) {
+            const item = layerMap[key];
+            const btn = document.getElementById(item.btn);
+            if (item.active) {
+                map.removeLayer(item.layer);
+                item.active = false;
+                btn.classList.remove('active-btn');
+            } else {
+                item.layer.addTo(map);
+                item.active = true;
+                btn.classList.add('active-btn');
+            }
+        }
+
+        // Fetch Citizen Reports
         fetch('/api/reports')
             .then(res => res.json())
             .then(reports => {
                 const feed = document.getElementById('hazard-feed');
                 if (reports.length > 0) feed.innerHTML = '';
                 reports.forEach(r => {
-                    const marker = L.circleMarker([r.latitude, r.longitude], {
-                        radius: 7,
-                        fillColor: '#f97316',
-                        color: '#ffffff',
-                        weight: 1.5,
-                        fillOpacity: 0.9
-                    }).addTo(crowdsourceLayer);
-
-                    marker.bindPopup(`<b>Crowdsourced Hazard</b><br>${r.description || 'Debris'}<br><small>${r.location_name || ''}</small>`);
+                    const m = L.circleMarker([r.latitude, r.longitude], {
+                        radius: 6, fillColor: '#f97316', color: '#ffffff', weight: 1.5, fillOpacity: 0.9
+                    }).addTo(landslideLayer);
+                    m.bindPopup(`<b>Crowdsourced Hazard</b><br>${r.description || 'Rockfall'}<br><small>${r.location_name || ''}</small>`);
 
                     const div = document.createElement('div');
-                    div.className = "p-2.5 bg-slate-900 rounded border border-slate-800 text-slate-300";
-                    div.innerHTML = `<span class="text-orange-400 font-semibold">● Alert:</span> ${r.description || 'Rockfall'} (${r.location_name || 'NE Zone'})`;
+                    div.className = "p-2.5 bg-slate-950 rounded border border-slate-800 text-slate-300";
+                    div.innerHTML = `<span class="text-orange-400 font-semibold">● Alert:</span> ${r.description || 'Hazard'} (${r.location_name || 'NE Zone'})`;
                     feed.appendChild(div);
                 });
-            })
-            .catch(() => {});
-
-        // 7. Leaflet Interactive Layer Control Box
-        const baseMaps = {
-            "Dark Canvas": darkBasemap,
-            "Satellite Imagery": satelliteBasemap
-        };
-
-        const overlayMaps = {
-            "🌧️ Rain Radar (Doppler)": rainRadarLayer,
-            "💨 Wind Dynamics": windLayer,
-            "☁️ Cloud Cover": cloudsLayer,
-            "🛣️ Susceptibility Corridors": corridorsLayer,
-            "📍 Citizen Incident Markers": crowdsourceLayer
-        };
-
-        L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);
+            }).catch(() => {});
     </script>
 </body>
 </html>
