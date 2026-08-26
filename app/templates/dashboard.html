@@ -50,24 +50,27 @@
             font-size: 11px;
             font-weight: 800;
             color: #ffffff;
-            background: rgba(15, 23, 42, 0.85);
-            padding: 3px 8px;
+            background: rgba(15, 23, 42, 0.88);
+            padding: 2px 7px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.8);
             white-space: nowrap;
         }
-        #temp-legend {
+        /* Exact SatFish Style Floating Top Gradient Bar */
+        #satfish-legend {
             position: absolute;
-            bottom: 24px;
-            right: 24px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255,255,255,0.2);
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
-            padding: 10px 14px;
-            border-radius: 10px;
+            padding: 6px 14px;
+            border-radius: 8px;
             z-index: 1000;
             display: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.7);
         }
     </style>
 </head>
@@ -189,15 +192,17 @@
         <!-- Right Side: Map Canvas -->
         <main class="flex-1 relative">
             <div id="map"></div>
-            <!-- Temperature Choropleth Legend -->
-            <div id="temp-legend">
-                <div class="text-[11px] font-bold text-white mb-1.5">State Thermal Profile (°C)</div>
-                <div class="space-y-1 text-[10px]">
-                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-blue-600 inline-block"></span> <span>Cold Alpine (&lt; 16°C)</span></div>
-                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-emerald-500 inline-block"></span> <span>Temperate Plateau (18-22°C)</span></div>
-                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-amber-500 inline-block"></span> <span>Sub-Tropical Hill (23-28°C)</span></div>
-                    <div class="flex items-center gap-2"><span class="w-3.5 h-3 rounded bg-red-600 inline-block"></span> <span>Warm Plains (30-35°C)</span></div>
+
+            <!-- SatFish Style Exact Top Thermal Scale Bar -->
+            <div id="satfish-legend">
+                <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
+                    <span>9.0°C</span>
+                    <span>15.5°C</span>
+                    <span>22.0°C</span>
+                    <span>28.5°C</span>
+                    <span>35.0°C</span>
                 </div>
+                <div class="h-3 w-64 md:w-80 rounded shadow-inner" style="background: linear-gradient(to right, #3b0764 0%, #1d4ed8 20%, #06b6d4 40%, #22c55e 60%, #facc15 78%, #ea580c 90%, #991b1b 100%);"></div>
             </div>
         </main>
     </div>
@@ -301,7 +306,7 @@
         // Initialize Map
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
 
-        // ESRI Dark Gray Base Map
+        // ESRI Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             attribution: 'Tiles &copy; Esri'
@@ -374,135 +379,108 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. PRECISE STATE-BY-STATE BOUNDARY TEMPERATURE FILL (CHOROPLETH)
+        // 4. SATFISH-STYLE HIGH-RESOLUTION TURBO THERMAL SURFACE
         const tempRadarLayer = L.layerGroup();
 
-        // All 8 Northeast States Geometrical Boundaries with Accurate Regional Profiles
-        const statePolygons = [
-            {
-                name: "Sikkim",
-                temp: "16°C",
-                type: "Alpine / Sub-Alpine Ridge",
-                color: "#2563eb", // Cold Deep Blue
-                center: [27.53, 88.51],
-                coords: [
-                    [28.13, 88.08], [28.10, 88.85], [27.78, 88.92], 
-                    [27.18, 88.75], [27.08, 88.55], [27.15, 88.10], [27.80, 88.02]
-                ]
-            },
-            {
-                name: "Arunachal Pradesh",
-                temp: "14°C (Tawang 11°C)",
-                type: "High Himalayan Cryo-Zone",
-                color: "#0284c7", // Cool Ocean Blue
-                center: [28.21, 94.72],
-                coords: [
-                    [27.50, 91.60], [28.00, 91.80], [28.60, 93.50], [29.30, 95.00], 
-                    [28.80, 96.50], [28.20, 97.40], [27.00, 96.80], [26.85, 95.50], 
-                    [27.10, 93.60], [26.90, 92.10]
-                ]
-            },
-            {
-                name: "Assam",
-                temp: "33°C (Guwahati 33°C)",
-                type: "Warm Brahmaputra River Basin",
-                color: "#ea580c", // Warm Red-Orange
-                center: [26.20, 92.93],
-                coords: [
-                    [26.90, 89.90], [26.95, 93.50], [27.80, 95.50], [27.30, 96.00], 
-                    [26.50, 95.00], [26.20, 93.80], [25.50, 93.20], [24.70, 93.00], 
-                    [24.50, 92.50], [25.10, 92.60], [25.80, 91.50], [26.00, 89.80]
-                ]
-            },
-            {
-                name: "Meghalaya",
-                temp: "19°C (Shillong 19°C)",
-                type: "Temperate High Plateau",
-                color: "#16a34a", // Emerald Green
-                center: [25.50, 91.30],
-                coords: [
-                    [26.00, 89.80], [26.10, 92.40], [25.60, 92.80], 
-                    [25.10, 92.60], [25.15, 90.00], [25.60, 89.80]
-                ]
-            },
-            {
-                name: "Nagaland",
-                temp: "22°C (Kohima 22°C)",
-                type: "Sub-Tropical High Ridge",
-                color: "#65a30d", // Lime Green
-                center: [26.15, 94.56],
-                coords: [
-                    [26.85, 95.50], [27.00, 95.10], [26.20, 94.20], 
-                    [25.50, 93.50], [25.60, 94.50], [26.40, 95.20]
-                ]
-            },
-            {
-                name: "Manipur",
-                temp: "28°C (Imphal 28°C)",
-                type: "Sub-Tropical Enclosed Valley",
-                color: "#eab308", // Yellow
-                center: [24.66, 93.90],
-                coords: [
-                    [25.60, 94.50], [25.50, 93.50], [24.50, 93.00], 
-                    [23.90, 93.20], [24.20, 94.50], [25.00, 94.60]
-                ]
-            },
-            {
-                name: "Mizoram",
-                temp: "24°C (Aizawl 24°C)",
-                type: "Hilly Ridge Corridor",
-                color: "#d97706", // Amber
-                center: [23.16, 92.93],
-                coords: [
-                    [24.50, 93.00], [24.30, 92.30], [23.00, 92.20], 
-                    [22.00, 92.80], [22.40, 93.20], [23.90, 93.20]
-                ]
-            },
-            {
-                name: "Tripura",
-                temp: "34°C (Agartala 34°C)",
-                type: "Tropical Lowland Basin",
-                color: "#dc2626", // Crimson Red
-                center: [23.83, 91.50],
-                coords: [
-                    [24.50, 92.00], [24.50, 92.30], [23.70, 92.30], 
-                    [23.00, 91.80], [23.20, 91.20], [24.20, 91.30]
-                ]
-            }
+        const tempStations = [
+            { lat: 27.58, lng: 91.86, temp: 11.0, name: "Tawang" },
+            { lat: 27.70, lng: 88.70, temp: 9.0, name: "North Sikkim" },
+            { lat: 27.33, lng: 88.61, temp: 16.0, name: "Gangtok" },
+            { lat: 28.15, lng: 94.60, temp: 13.5, name: "Upper Siang" },
+            { lat: 25.57, lng: 91.89, temp: 19.0, name: "Shillong" },
+            { lat: 25.67, lng: 94.10, temp: 22.0, name: "Kohima" },
+            { lat: 23.72, lng: 92.71, temp: 24.5, name: "Aizawl" },
+            { lat: 25.18, lng: 93.02, temp: 26.5, name: "Haflong" },
+            { lat: 27.10, lng: 93.62, temp: 27.0, name: "Itanagar" },
+            { lat: 24.81, lng: 93.93, temp: 28.5, name: "Imphal" },
+            { lat: 27.47, lng: 94.91, temp: 31.0, name: "Dibrugarh" },
+            { lat: 26.65, lng: 92.80, temp: 32.5, name: "Tezpur" },
+            { lat: 26.18, lng: 91.75, temp: 33.5, name: "Guwahati" },
+            { lat: 23.83, lng: 91.28, temp: 34.5, name: "Agartala" },
+            { lat: 24.83, lng: 92.77, temp: 32.0, name: "Silchar" }
         ];
 
-        // Draw Crisp State Polygons with Temperature Fills
-        statePolygons.forEach(st => {
-            const polygon = L.polygon(st.coords, {
-                color: '#ffffff',
-                weight: 1.5,
-                opacity: 0.9,
-                fillColor: st.color,
-                fillOpacity: 0.55
-            }).addTo(tempRadarLayer);
+        // Exact Multi-Stop SatFish Spectrum Palette (Purple -> Blue -> Cyan -> Green -> Yellow -> Orange -> Crimson)
+        function getSatFishColor(t) {
+            // Normalized range 9°C to 35°C
+            const norm = Math.max(0, Math.min(1, (t - 9.0) / (35.0 - 9.0)));
+            
+            if (norm <= 0.15) {
+                // Purple to Royal Blue (#3b0764 -> #1d4ed8)
+                const f = norm / 0.15;
+                return [Math.round(59 + f * (29 - 59)), Math.round(7 + f * (78 - 7)), Math.round(100 + f * (216 - 100)), 0.70];
+            } else if (norm <= 0.35) {
+                // Blue to Cyan (#1d4ed8 -> #06b6d4)
+                const f = (norm - 0.15) / 0.20;
+                return [Math.round(29 + f * (6 - 29)), Math.round(78 + f * (182 - 78)), Math.round(216 + f * (212 - 216)), 0.68];
+            } else if (norm <= 0.55) {
+                // Cyan to Lime Green (#06b6d4 -> #22c55e)
+                const f = (norm - 0.35) / 0.20;
+                return [Math.round(6 + f * (34 - 6)), Math.round(182 + f * (197 - 182)), Math.round(212 + f * (94 - 212)), 0.65];
+            } else if (norm <= 0.75) {
+                // Green to Vibrant Yellow (#22c55e -> #facc15)
+                const f = (norm - 0.55) / 0.20;
+                return [Math.round(34 + f * (250 - 34)), Math.round(197 + f * (204 - 197)), Math.round(94 + f * (21 - 94)), 0.65];
+            } else if (norm <= 0.90) {
+                // Yellow to Deep Orange (#facc15 -> #ea580c)
+                const f = (norm - 0.75) / 0.15;
+                return [Math.round(250 + f * (234 - 250)), Math.round(204 + f * (88 - 204)), Math.round(21 + f * (12 - 21)), 0.68];
+            } else {
+                // Orange to Dark Crimson (#ea580c -> #991b1b)
+                const f = (norm - 0.90) / 0.10;
+                return [Math.round(234 + f * (153 - 234)), Math.round(88 + f * (27 - 88)), Math.round(12 + f * (27 - 12)), 0.72];
+            }
+        }
 
-            polygon.bindPopup(`
-                <div style="font-size:12px;">
-                    <b style="color:${st.color}; font-size:14px;">${st.name}</b><br>
-                    <span>Average Temp: <b>${st.temp}</b></span><br>
-                    <span>Terrain: <i>${st.type}</i></span>
-                </div>
-            `);
+        function createSatFishCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 250;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(canvas.width, canvas.height);
 
-            // Interactive hover effect
-            polygon.on('mouseover', function () {
-                this.setStyle({ fillOpacity: 0.8, weight: 2.5 });
-            });
-            polygon.on('mouseout', function () {
-                this.setStyle({ fillOpacity: 0.55, weight: 1.5 });
-            });
+            const minLat = 22.0, maxLat = 29.5;
+            const minLng = 87.5, maxLng = 97.5;
 
-            // Badge Marker at state center
-            const badgeIcon = L.divIcon({
-                className: 'temp-badge-box',
-                html: `<div class="temp-badge">${st.name}: <b>${st.temp}</b></div>`
+            for (let y = 0; y < canvas.height; y++) {
+                const lat = maxLat - (y / canvas.height) * (maxLat - minLat);
+                for (let x = 0; x < canvas.width; x++) {
+                    const lng = minLng + (x / canvas.width) * (maxLng - minLng);
+
+                    let num = 0, den = 0;
+                    for (let s of tempStations) {
+                        const d2 = Math.pow(lat - s.lat, 2) + Math.pow(lng - s.lng, 2) + 0.0005;
+                        const w = 1 / Math.pow(d2, 1.35);
+                        num += s.temp * w;
+                        den += w;
+                    }
+                    const interpolatedTemp = num / den;
+                    const color = getSatFishColor(interpolatedTemp);
+
+                    const idx = (y * canvas.width + x) * 4;
+                    imgData.data[idx] = color[0];
+                    imgData.data[idx + 1] = color[1];
+                    imgData.data[idx + 2] = color[2];
+                    imgData.data[idx + 3] = Math.floor(color[3] * 255);
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return canvas.toDataURL();
+        }
+
+        const thermalBounds = [[22.0, 87.5], [29.5, 97.5]];
+        L.imageOverlay(createSatFishCanvas(), thermalBounds, {
+            opacity: 0.88,
+            zIndex: 350
+        }).addTo(tempRadarLayer);
+
+        // SatFish Style Discrete Location Badges
+        tempStations.forEach(s => {
+            const labelIcon = L.divIcon({
+                className: 'temp-badge-container',
+                html: `<div class="temp-badge">${s.name} <b>${s.temp.toFixed(1)}°C</b></div>`
             });
-            L.marker(st.center, { icon: badgeIcon }).addTo(tempRadarLayer);
+            L.marker([s.lat, s.lng], { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
         });
 
         // 5. Wind Radar
@@ -556,17 +534,17 @@
         function toggleRadar(key) {
             const item = radars[key];
             const el = document.getElementById(item.btn);
-            const legend = document.getElementById('temp-legend');
+            const satLegend = document.getElementById('satfish-legend');
             if (item.active) {
                 map.removeLayer(item.layer);
                 item.active = false;
                 el.classList.remove('active');
-                if (key === 'temp') legend.style.display = 'none';
+                if (key === 'temp') satLegend.style.display = 'none';
             } else {
                 item.layer.addTo(map);
                 item.active = true;
                 el.classList.add('active');
-                if (key === 'temp') legend.style.display = 'block';
+                if (key === 'temp') satLegend.style.display = 'block';
             }
         }
     </script>
