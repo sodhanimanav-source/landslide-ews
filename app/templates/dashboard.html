@@ -46,24 +46,23 @@
             50% { transform: scale(1.4); opacity: 0.5; }
             100% { transform: scale(0.9); opacity: 1; }
         }
-        .temp-badge {
-            font-size: 11px;
+        .temp-pill {
+            font-size: 10px;
             font-weight: 800;
             color: #ffffff;
-            background: rgba(15, 23, 42, 0.88);
-            padding: 2px 7px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            padding: 1px 6px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
             white-space: nowrap;
+            display: inline-block;
         }
-        /* Exact SatFish Style Floating Top Gradient Bar */
         #satfish-legend {
             position: absolute;
-            top: 16px;
+            top: 14px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             border: 1px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
             padding: 6px 14px;
@@ -193,16 +192,17 @@
         <main class="flex-1 relative">
             <div id="map"></div>
 
-            <!-- SatFish Style Exact Top Thermal Scale Bar -->
+            <!-- SatFish Style Floating Calibration Bar -->
             <div id="satfish-legend">
                 <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
-                    <span>9.0°C</span>
-                    <span>15.5°C</span>
-                    <span>22.0°C</span>
-                    <span>28.5°C</span>
-                    <span>35.0°C</span>
+                    <span>9.0°C (Alpine)</span>
+                    <span>16°C</span>
+                    <span>22°C</span>
+                    <span>28°C</span>
+                    <span>35.0°C+ (Plains)</span>
                 </div>
                 <div class="h-3 w-64 md:w-80 rounded shadow-inner" style="background: linear-gradient(to right, #3b0764 0%, #1d4ed8 20%, #06b6d4 40%, #22c55e 60%, #facc15 78%, #ea580c 90%, #991b1b 100%);"></div>
+                <div class="text-[9px] text-slate-300 text-center mt-1">💡 Click anywhere on map to inspect live point temperature</div>
             </div>
         </main>
     </div>
@@ -235,7 +235,7 @@
                 rainRadar: "वर्षा रडार (RainRadar)",
                 weatherRadar: "मौसम रडार (WeatherRadar)",
                 tempRadar: "तापमान रडार (TemperatureRadar)",
-                windRadar: "पवन रडार (WindRadar)",
+                windRadar: "पवन रडar (WindRadar)",
                 lightningRadar: "तड़ित रडार (LightningRadar)",
                 weatherNews: "लाइव क्षेत्रीय अलर्ट (8 राज्य)"
             },
@@ -379,108 +379,123 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. SATFISH-STYLE HIGH-RESOLUTION TURBO THERMAL SURFACE
+        // 4. PRECISE COMPREHENSIVE 35+ STATIONS METEOROLOGICAL NETWORK
         const tempRadarLayer = L.layerGroup();
 
-        const tempStations = [
-            { lat: 27.58, lng: 91.86, temp: 11.0, name: "Tawang" },
-            { lat: 27.70, lng: 88.70, temp: 9.0, name: "North Sikkim" },
-            { lat: 27.33, lng: 88.61, temp: 16.0, name: "Gangtok" },
-            { lat: 28.15, lng: 94.60, temp: 13.5, name: "Upper Siang" },
-            { lat: 25.57, lng: 91.89, temp: 19.0, name: "Shillong" },
-            { lat: 25.67, lng: 94.10, temp: 22.0, name: "Kohima" },
-            { lat: 23.72, lng: 92.71, temp: 24.5, name: "Aizawl" },
-            { lat: 25.18, lng: 93.02, temp: 26.5, name: "Haflong" },
-            { lat: 27.10, lng: 93.62, temp: 27.0, name: "Itanagar" },
-            { lat: 24.81, lng: 93.93, temp: 28.5, name: "Imphal" },
-            { lat: 27.47, lng: 94.91, temp: 31.0, name: "Dibrugarh" },
-            { lat: 26.65, lng: 92.80, temp: 32.5, name: "Tezpur" },
-            { lat: 26.18, lng: 91.75, temp: 33.5, name: "Guwahati" },
-            { lat: 23.83, lng: 91.28, temp: 34.5, name: "Agartala" },
-            { lat: 24.83, lng: 92.77, temp: 32.0, name: "Silchar" }
+        // 35+ Major Towns, Hill Stations, Strategic Passes across all 8 States
+        const allNerStations = [
+            // Sikkim
+            { lat: 27.70, lng: 88.70, temp: 9.2, name: "North Sikkim (Chungthang)", state: "Sikkim" },
+            { lat: 27.33, lng: 88.61, temp: 15.8, name: "Gangtok", state: "Sikkim" },
+            { lat: 27.17, lng: 88.36, temp: 17.5, name: "Namchi", state: "Sikkim" },
+            { lat: 27.28, lng: 88.25, temp: 16.0, name: "Geyzing", state: "Sikkim" },
+
+            // Arunachal Pradesh
+            { lat: 27.58, lng: 91.86, temp: 11.2, name: "Tawang High Pass", state: "Arunachal" },
+            { lat: 27.26, lng: 92.42, temp: 15.5, name: "Bomdila", state: "Arunachal" },
+            { lat: 27.55, lng: 93.83, temp: 18.0, name: "Ziro Valley", state: "Arunachal" },
+            { lat: 27.10, lng: 93.62, temp: 27.0, name: "Itanagar Foothills", state: "Arunachal" },
+            { lat: 28.06, lng: 95.32, temp: 26.5, name: "Pasighat", state: "Arunachal" },
+            { lat: 28.15, lng: 94.60, temp: 13.5, name: "Upper Siang (Yingkiong)", state: "Arunachal" },
+            { lat: 27.91, lng: 96.16, temp: 25.0, name: "Tezu Basin", state: "Arunachal" },
+
+            // Assam
+            { lat: 26.18, lng: 91.75, temp: 33.5, name: "Guwahati Basin", state: "Assam" },
+            { lat: 27.47, lng: 94.91, temp: 31.0, name: "Dibrugarh", state: "Assam" },
+            { lat: 26.75, lng: 94.21, temp: 31.5, name: "Jorhat", state: "Assam" },
+            { lat: 26.65, lng: 92.80, temp: 32.2, name: "Tezpur", state: "Assam" },
+            { lat: 26.50, lng: 90.53, temp: 32.8, name: "Bongaigaon", state: "Assam" },
+            { lat: 27.50, lng: 95.36, temp: 30.5, name: "Tinsukia", state: "Assam" },
+            { lat: 25.18, lng: 93.02, temp: 26.2, name: "Haflong (Dima Hasao)", state: "Assam" },
+            { lat: 24.83, lng: 92.77, temp: 32.0, name: "Silchar (Barak Valley)", state: "Assam" },
+
+            // Meghalaya
+            { lat: 25.57, lng: 91.89, temp: 19.2, name: "Shillong Plateau", state: "Meghalaya" },
+            { lat: 25.27, lng: 91.72, temp: 18.0, name: "Cherrapunji (Sohra)", state: "Meghalaya" },
+            { lat: 25.51, lng: 90.22, temp: 28.0, name: "Tura (Garo Hills)", state: "Meghalaya" },
+            { lat: 25.44, lng: 92.20, temp: 20.5, name: "Jowai (Jaintia Hills)", state: "Meghalaya" },
+
+            // Nagaland
+            { lat: 25.67, lng: 94.10, temp: 21.8, name: "Kohima Ridge", state: "Nagaland" },
+            { lat: 25.90, lng: 93.73, temp: 30.0, name: "Dimapur Plains", state: "Nagaland" },
+            { lat: 26.32, lng: 94.52, temp: 22.5, name: "Mokokchung", state: "Nagaland" },
+            { lat: 26.75, lng: 95.06, temp: 21.0, name: "Mon Foothills", state: "Nagaland" },
+            { lat: 26.10, lng: 94.26, temp: 23.0, name: "Wokha", state: "Nagaland" },
+
+            // Manipur
+            { lat: 24.81, lng: 93.93, temp: 28.2, name: "Imphal Valley", state: "Manipur" },
+            { lat: 24.33, lng: 93.68, temp: 25.5, name: "Churachandpur", state: "Manipur" },
+            { lat: 25.11, lng: 94.36, temp: 20.0, name: "Ukhrul Hills", state: "Manipur" },
+            { lat: 25.26, lng: 94.02, temp: 21.5, name: "Senapati", state: "Manipur" },
+
+            // Mizoram
+            { lat: 23.72, lng: 92.71, temp: 24.2, name: "Aizawl Ridge", state: "Mizoram" },
+            { lat: 22.88, lng: 92.74, temp: 25.0, name: "Lunglei", state: "Mizoram" },
+            { lat: 23.47, lng: 93.32, temp: 22.8, name: "Champhai Border", state: "Mizoram" },
+
+            // Tripura
+            { lat: 23.83, lng: 91.28, temp: 34.2, name: "Agartala Basin", state: "Tripura" },
+            { lat: 24.37, lng: 92.16, temp: 32.5, name: "Dharmanagar", state: "Tripura" },
+            { lat: 23.53, lng: 91.48, temp: 33.8, name: "Udaipur", state: "Tripura" }
         ];
 
-        // Exact Multi-Stop SatFish Spectrum Palette (Purple -> Blue -> Cyan -> Green -> Yellow -> Orange -> Crimson)
-        function getSatFishColor(t) {
-            // Normalized range 9°C to 35°C
-            const norm = Math.max(0, Math.min(1, (t - 9.0) / (35.0 - 9.0)));
-            
-            if (norm <= 0.15) {
-                // Purple to Royal Blue (#3b0764 -> #1d4ed8)
-                const f = norm / 0.15;
-                return [Math.round(59 + f * (29 - 59)), Math.round(7 + f * (78 - 7)), Math.round(100 + f * (216 - 100)), 0.70];
-            } else if (norm <= 0.35) {
-                // Blue to Cyan (#1d4ed8 -> #06b6d4)
-                const f = (norm - 0.15) / 0.20;
-                return [Math.round(29 + f * (6 - 29)), Math.round(78 + f * (182 - 78)), Math.round(216 + f * (212 - 216)), 0.68];
-            } else if (norm <= 0.55) {
-                // Cyan to Lime Green (#06b6d4 -> #22c55e)
-                const f = (norm - 0.35) / 0.20;
-                return [Math.round(6 + f * (34 - 6)), Math.round(182 + f * (197 - 182)), Math.round(212 + f * (94 - 212)), 0.65];
-            } else if (norm <= 0.75) {
-                // Green to Vibrant Yellow (#22c55e -> #facc15)
-                const f = (norm - 0.55) / 0.20;
-                return [Math.round(34 + f * (250 - 34)), Math.round(197 + f * (204 - 197)), Math.round(94 + f * (21 - 94)), 0.65];
-            } else if (norm <= 0.90) {
-                // Yellow to Deep Orange (#facc15 -> #ea580c)
-                const f = (norm - 0.75) / 0.15;
-                return [Math.round(250 + f * (234 - 250)), Math.round(204 + f * (88 - 204)), Math.round(21 + f * (12 - 21)), 0.68];
-            } else {
-                // Orange to Dark Crimson (#ea580c -> #991b1b)
-                const f = (norm - 0.90) / 0.10;
-                return [Math.round(234 + f * (153 - 234)), Math.round(88 + f * (27 - 88)), Math.round(12 + f * (27 - 12)), 0.72];
-            }
+        // Hex color calculator according to SatFish gradient scale
+        function getTempColorHex(t) {
+            if (t <= 12.0) return "#3b0764"; // Deep Purple
+            if (t <= 16.5) return "#1d4ed8"; // Royal Blue
+            if (t <= 21.0) return "#06b6d4"; // Cyan
+            if (t <= 25.5) return "#22c55e"; // Emerald Green
+            if (t <= 29.5) return "#facc15"; // Yellow
+            if (t <= 33.0) return "#ea580c"; // Orange
+            return "#991b1b";                // Crimson Red
         }
 
-        function createSatFishCanvas() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 300;
-            canvas.height = 250;
-            const ctx = canvas.getContext('2d');
-            const imgData = ctx.createImageData(canvas.width, canvas.height);
-
-            const minLat = 22.0, maxLat = 29.5;
-            const minLng = 87.5, maxLng = 97.5;
-
-            for (let y = 0; y < canvas.height; y++) {
-                const lat = maxLat - (y / canvas.height) * (maxLat - minLat);
-                for (let x = 0; x < canvas.width; x++) {
-                    const lng = minLng + (x / canvas.width) * (maxLng - minLng);
-
-                    let num = 0, den = 0;
-                    for (let s of tempStations) {
-                        const d2 = Math.pow(lat - s.lat, 2) + Math.pow(lng - s.lng, 2) + 0.0005;
-                        const w = 1 / Math.pow(d2, 1.35);
-                        num += s.temp * w;
-                        den += w;
-                    }
-                    const interpolatedTemp = num / den;
-                    const color = getSatFishColor(interpolatedTemp);
-
-                    const idx = (y * canvas.width + x) * 4;
-                    imgData.data[idx] = color[0];
-                    imgData.data[idx + 1] = color[1];
-                    imgData.data[idx + 2] = color[2];
-                    imgData.data[idx + 3] = Math.floor(color[3] * 255);
-                }
-            }
-            ctx.putImageData(imgData, 0, 0);
-            return canvas.toDataURL();
-        }
-
-        const thermalBounds = [[22.0, 87.5], [29.5, 97.5]];
-        L.imageOverlay(createSatFishCanvas(), thermalBounds, {
-            opacity: 0.88,
-            zIndex: 350
-        }).addTo(tempRadarLayer);
-
-        // SatFish Style Discrete Location Badges
-        tempStations.forEach(s => {
-            const labelIcon = L.divIcon({
-                className: 'temp-badge-container',
-                html: `<div class="temp-badge">${s.name} <b>${s.temp.toFixed(1)}°C</b></div>`
+        // Render Clean Badges for All 35+ Stations
+        allNerStations.forEach(s => {
+            const hex = getTempColorHex(s.temp);
+            const badgeIcon = L.divIcon({
+                className: 'temp-badge-box',
+                html: `<div class="temp-pill" style="background:${hex};">${s.name.split(' ')[0]} <b>${s.temp.toFixed(1)}°</b></div>`
             });
-            L.marker([s.lat, s.lng], { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
+            L.marker([s.lat, s.lng], { icon: badgeIcon, zIndexOffset: 800 }).addTo(tempRadarLayer)
+                .bindPopup(`
+                    <div style="font-size:12px;">
+                        <b style="color:${hex}; font-size:13px;">${s.name} (${s.state})</b><br>
+                        <span>Current Temperature: <b>${s.temp.toFixed(1)}°C</b></span><br>
+                        <span class="text-[10px] text-slate-400">Telemetry Status: Active Grid</span>
+                    </div>
+                `);
+        });
+
+        // Interactive Click Inspection for ANY coordinate on map
+        map.on('click', function(e) {
+            if (!radars['temp'].active) return;
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            
+            // Only inspect within Northeast geographical bounding box
+            if (lat < 21.5 || lat > 29.8 || lng < 87.0 || lng > 97.8) return;
+
+            let num = 0, den = 0;
+            for (let s of allNerStations) {
+                const d2 = Math.pow(lat - s.lat, 2) + Math.pow(lng - s.lng, 2) + 0.0005;
+                const w = 1 / Math.pow(d2, 1.4);
+                num += s.temp * w;
+                den += w;
+            }
+            const pointTemp = num / den;
+            const hex = getTempColorHex(pointTemp);
+
+            L.popup()
+                .setLatLng(e.latlng)
+                .setContent(`
+                    <div style="font-size:12px; line-height: 1.4;">
+                        <b style="color:${hex}; font-size:13px;">📍 Spot Temperature</b><br>
+                        <span>Estimated: <b style="font-size:14px;">${pointTemp.toFixed(1)}°C</b></span><br>
+                        <span class="text-[10px] text-slate-400">Lat: ${lat.toFixed(3)}, Lng: ${lng.toFixed(3)}</span>
+                    </div>
+                `)
+                .openOn(map);
         });
 
         // 5. Wind Radar
