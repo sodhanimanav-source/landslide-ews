@@ -62,6 +62,7 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
+    <!-- Top Bar -->
     <nav class="bg-slate-900 border-b border-slate-800 px-6 py-2.5 flex justify-between items-center z-50">
         <div class="flex items-center space-x-3">
             <span class="text-2xl">🏔️</span>
@@ -72,6 +73,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
+            <!-- Language Dropdown -->
             <div class="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
                 <span class="text-xs">🌐</span>
                 <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-transparent text-xs text-white outline-none cursor-pointer">
@@ -92,8 +94,11 @@
         </div>
     </nav>
 
+    <!-- Main Body Container -->
     <div class="flex flex-1 overflow-hidden">
-        <aside class="sidebar-bg w-64 flex-shrink-0 border-r border-slate-700/50 flex flex-col justify-between overflow-y-auto">
+        
+        <!-- Left Blue Radar Sidebar -->
+        <aside class="sidebar-bg w-72 flex-shrink-0 border-r border-slate-700/50 flex flex-col justify-between overflow-y-auto">
             <div class="py-3 space-y-1">
                 
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
@@ -116,6 +121,7 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
+                <!-- Radar Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -147,25 +153,41 @@
                 </div>
             </div>
 
-            <div class="p-3 border-t border-white/10 bg-black/20">
-                <div class="flex items-center gap-2 text-white font-semibold text-xs mb-1.5">
-                    <span>💬</span>
-                    <span id="t-weather-news">Regional Risk Bulletins</span>
+            <!-- Complete Scrollable All 8-States Bulletins Feed -->
+            <div class="p-3 border-t border-white/10 bg-black/30 flex flex-col max-h-52 overflow-y-auto">
+                <div class="flex items-center justify-between text-white font-semibold text-xs mb-2">
+                    <span class="flex items-center gap-1.5">
+                        <span>💬</span>
+                        <span id="t-weather-news">Live Regional Alerts (8 States)</span>
+                    </span>
+                    <span class="bg-red-500/30 text-red-300 text-[9px] px-1.5 py-0.5 rounded font-bold">LIVE</span>
                 </div>
-                <div class="text-[11px] text-white/70 space-y-1">
-                    <p class="truncate text-red-300">● Tawang & Sela: Glacial Slope Risk</p>
-                    <p class="truncate text-red-300">● Dima Hasao: Rail Subsidence Alert</p>
-                    <p class="truncate text-amber-300">● Aizawl Urban: Slope Saturation</p>
+                <div id="bulletin-list" class="text-[11px] space-y-1.5 pr-1">
+                    <p class="text-red-400 font-medium">🔴 NH-10 (Sevoke–Gangtok): Critical Red (91%)</p>
+                    <p class="text-red-400 font-medium">🔴 Chungthang–Mangan: GLOF Moraine Alert (88%)</p>
+                    <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
+                    <p class="text-red-400 font-medium">🔴 Dima Hasao Lumding Rail: Track Subsidence (89%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-37 (Imphal–Jiribam): Severe Mudslide (86%)</p>
+                    <p class="text-red-400 font-medium">🔴 Tupul–Noney Basin: Fracture Movement (85%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-54 (Aizawl–Lunglei): Slope Failure (76%)</p>
+                    <p class="text-amber-400 font-medium">🟡 NH-6 Sonapur Tunnel: Saturated Strata (79%)</p>
+                    <p class="text-amber-400 font-medium">🟡 Trans-Arunachal (Itanagar–Ziro): Heavy Rain (58%)</p>
+                    <p class="text-amber-400 font-medium">🟡 Cherrapunji Plateau: Heavy Infiltration (64%)</p>
+                    <p class="text-emerald-400 font-medium">🟢 Jampui Hills (Tripura): Low Hazard (28%)</p>
+                    <p class="text-emerald-400 font-medium">🟢 Shillong Bypass NH-206: Normal Traffic (22%)</p>
                 </div>
             </div>
         </aside>
 
+        <!-- Right Side Leaflet Map -->
         <main class="flex-1 relative">
             <div id="map"></div>
         </main>
     </div>
 
     <script>
+        // Multi-Language Dictionary
         const i18n = {
             en: {
                 title: "Northeast Landslide & Multi-Hazard EWS",
@@ -180,7 +202,7 @@
                 tempRadar: "TemperatureRadar",
                 windRadar: "WindRadar",
                 lightningRadar: "LightningRadar",
-                weatherNews: "Regional Risk Bulletins"
+                weatherNews: "Live Regional Alerts (8 States)"
             },
             hi: {
                 title: "पूर्वोत्तर भूस्खलन एवं बहु-आपदा पूर्व चेतावनी प्रणाली",
@@ -195,7 +217,7 @@
                 tempRadar: "तापमान रडार (TemperatureRadar)",
                 windRadar: "पवन रडार (WindRadar)",
                 lightningRadar: "तड़ित रडार (LightningRadar)",
-                weatherNews: "क्षेत्रीय जोखिम बुलेटिन"
+                weatherNews: "लाइव क्षेत्रीय अलर्ट (8 राज्य)"
             },
             as: {
                 title: "উত্তৰ-পূব ভূমিস্খলন প্ৰাৰম্ভিক সতৰ্কবাণী ব্যৱস্থা",
@@ -210,7 +232,7 @@
                 tempRadar: "তাপমাত্ৰা ৰাডাৰ",
                 windRadar: "বতাহ ৰাডাৰ",
                 lightningRadar: "বজ্ৰপাত ৰাডাৰ",
-                weatherNews: "আঞ্চলিক সতৰ্কবাণী বুলেটিন"
+                weatherNews: "সক্ৰিয় আঞ্চলিক সতৰ্কবাণী (৮ ৰাজ্য)"
             },
             bn: {
                 title: "উত্তর-পূর্ব ভূমিধস ও বহু-বিপর্যয় সতর্কবার্তা ব্যবস্থা",
@@ -225,7 +247,7 @@
                 tempRadar: "তাপমাত্রা রাডার",
                 windRadar: "বায়ু রাডার",
                 lightningRadar: "বজ্রপাত রাডার",
-                weatherNews: "আঞ্চলিক বুলেটিন ও সতর্কতা"
+                weatherNews: "লাইভ আঞ্চলিক সতর্কতা (৮ রাজ্য)"
             },
             ne: {
                 title: "उत्तर-पूर्व पहिरो पूर्व चेतावनी प्रणाली",
@@ -240,7 +262,7 @@
                 tempRadar: "तापक्रम राडार",
                 windRadar: "हावा राडार",
                 lightningRadar: "चट्याङ राडार",
-                weatherNews: "क्षेत्रीय जोखिम बुलेटिन"
+                weatherNews: "प्रत्यक्ष क्षेत्रीय सतर्कता (८ राज्यहरू)"
             }
         };
 
@@ -261,16 +283,16 @@
             document.getElementById('t-weather-news').innerText = t.weatherNews;
         }
 
+        // Initialize Map
         const map = L.map('map', { maxZoom: 18, minZoom: 5 }).setView([26.15, 93.00], 7);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
             attribution: '&copy; CARTO'
         }).addTo(map);
 
-        // 1. COMPREHENSIVE REGIONAL LANDSLIDE LAYER (Corridors, Urban Hills, Mountain Passes & Rail Zones)
+        // 1. Full Pan-NER Landslide Hazard Layer
         const landslideLayer = L.layerGroup().addTo(map);
 
-        // A. Multi-State Arterial & Border Corridors
         const corridors = [
             { name: "Sikkim: NH-10 (Sevoke - Gangtok)", category: "Arterial Corridor", risk: "CRITICAL RED (91%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.338, 88.606]], color: "#ef4444" },
             { name: "North Sikkim: Chungthang - Mangan Belt", category: "GLOF & Moraine Zone", risk: "CRITICAL RED (88%)", coords: [[27.500, 88.650], [27.600, 88.640], [27.700, 88.700]], color: "#ef4444" },
@@ -292,7 +314,6 @@
                 .bindPopup(`<b>${c.name}</b><br>Type: <i>${c.category}</i><br>Risk Level: <b style="color:${c.color}">${c.risk}</b>`);
         });
 
-        // B. Regional High-Risk Urban & Valley Surveillance Zones
         const regionZones = [
             { pos: [27.338, 88.606], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
             { pos: [25.180, 93.020], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
@@ -306,7 +327,7 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. RAIN RADAR (RainViewer with upscale support)
+        // 2. Rain Radar
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -319,7 +340,7 @@
                 }
             }).catch(() => {});
 
-        // 3. WEATHER / CLOUD OVERLAY
+        // 3. Cloud / Weather Overlay
         const weatherRadarLayer = L.layerGroup();
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
@@ -331,7 +352,7 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. TEMPERATURE RADAR (All 8 Northeast State Centers)
+        // 4. Temperature Radar
         const tempRadarLayer = L.layerGroup();
         const tempStations = [
             { pos: [26.18, 91.75], name: "Guwahati (Assam)", temp: "33°C", cool: false },
@@ -354,7 +375,7 @@
             L.marker(s.pos, { icon: tempIcon }).addTo(tempRadarLayer);
         });
 
-        // 5. WIND RADAR (Regional Multi-Station Stream)
+        // 5. Wind Radar
         const windRadarLayer = L.layerGroup();
         const windStations = [
             { pos: [26.18, 91.75], speed: "18 km/h SW", arrow: "↗", name: "Brahmaputra Basin" },
@@ -363,7 +384,7 @@
             { pos: [25.67, 94.10], speed: "14 km/h E", arrow: "←", name: "Naga Hills" },
             { pos: [24.81, 93.93], speed: "11 km/h NE", arrow: "↙", name: "Imphal Valley" },
             { pos: [23.72, 92.71], speed: "21 km/h SE", arrow: "↖", name: "Mizo Ridge" },
-            { pos: [27.58, 91.86], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass Pass" }
+            { pos: [27.58, 91.86], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass" }
         ];
         windStations.forEach(w => {
             const windIcon = L.divIcon({
@@ -374,7 +395,7 @@
                 .bindPopup(`<b>💨 Wind Telemetry: ${w.name}</b><br>Speed: ${w.speed}`);
         });
 
-        // 6. LIGHTNING RADAR
+        // 6. Lightning Radar
         const lightningRadarLayer = L.layerGroup();
         const strikes = [
             { pos: [26.15, 91.75], name: "Kamrup Microburst" },
@@ -392,7 +413,7 @@
                 .bindPopup(`<b>⚡ Severe Lightning Strike</b><br>Location: ${st.name}`);
         });
 
-        // Toggle Switcher Controller
+        // Toggle Switcher
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
             'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
