@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <style>
         #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0b111e; }
         .sidebar-bg {
@@ -51,11 +50,11 @@
             font-size: 11px;
             font-weight: 800;
             color: #ffffff;
-            background: rgba(0, 0, 0, 0.65);
-            padding: 2px 6px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 2px 7px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.8);
             white-space: nowrap;
         }
     </style>
@@ -352,54 +351,47 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. VIVID FULL-COVERAGE CONTINUOUS THERMAL HEATMAP (Weather&Radar Style)
+        // 4. GUARANTEED VIVID SYNTHETIC THERMAL OVERLAY (Weather&Radar Direct SVG Gradient)
         const tempRadarLayer = L.layerGroup();
-        
-        // Generate dense spatial interpolation grid for vibrant continuous color fill
-        const thermalGrid = [];
-        
-        // High Himalayan Cool Zone (Deep Blue / Cyan: 8°C - 16°C)
-        for (let lat = 27.2; lat <= 28.8; lat += 0.25) {
-            for (let lng = 88.0; lng <= 97.0; lng += 0.35) {
-                thermalGrid.push([lat, lng, 0.2]);
-                thermalGrid.push([lat + 0.05, lng + 0.05, 0.25]);
-            }
-        }
-        
-        // Mid Hills & Valley Temperate Zone (Emerald Green / Yellow: 18°C - 25°C)
-        for (let lat = 24.5; lat <= 26.5; lat += 0.25) {
-            for (let lng = 91.5; lng <= 95.5; lng += 0.35) {
-                thermalGrid.push([lat, lng, 0.55]);
-                thermalGrid.push([lat + 0.05, lng + 0.05, 0.60]);
-            }
-        }
 
-        // Lowland River Basins & Plains Hot Zone (Fiery Orange / Crimson Red: 28°C - 35°C)
-        for (let lat = 23.0; lat <= 26.8; lat += 0.25) {
-            for (let lng = 89.0; lng <= 94.0; lng += 0.35) {
-                thermalGrid.push([lat, lng, 0.88]);
-                thermalGrid.push([lat + 0.05, lng + 0.05, 0.95]);
-            }
-        }
+        // Exact SVG spatial heat map covering Northeast India (22°N to 29.5°N, 87°E to 98°E)
+        const svgHeatmapData = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="100%" height="100%">
+            <defs>
+                <radialGradient id="himalayaCool" cx="40%" cy="15%" r="45%">
+                    <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.85"/>
+                    <stop offset="35%" stop-color="#0284c7" stop-opacity="0.8"/>
+                    <stop offset="70%" stop-color="#06b6d4" stop-opacity="0.75"/>
+                    <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
+                </radialGradient>
+                <radialGradient id="valleyMid" cx="60%" cy="50%" r="40%">
+                    <stop offset="0%" stop-color="#16a34a" stop-opacity="0.8"/>
+                    <stop offset="40%" stop-color="#eab308" stop-opacity="0.78"/>
+                    <stop offset="80%" stop-color="#f97316" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"/>
+                </radialGradient>
+                <radialGradient id="plainsHot" cx="40%" cy="75%" r="45%">
+                    <stop offset="0%" stop-color="#dc2626" stop-opacity="0.85"/>
+                    <stop offset="45%" stop-color="#ea580c" stop-opacity="0.8"/>
+                    <stop offset="75%" stop-color="#facc15" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#16a34a" stop-opacity="0.0"/>
+                </radialGradient>
+            </defs>
+            <rect width="1000" height="800" fill="url(#himalayaCool)"/>
+            <rect width="1000" height="800" fill="url(#valleyMid)" style="mix-blend-mode: screen;"/>
+            <rect width="1000" height="800" fill="url(#plainsHot)" style="mix-blend-mode: screen;"/>
+        </svg>`;
 
-        // Heavy-Intensity Leaflet Heat Layer with 0.85 Vivid Opacity
-        L.heatLayer(thermalGrid, {
-            radius: 120,
-            blur: 45,
-            maxZoom: 10,
-            max: 1.0,
-            minOpacity: 0.75,
-            gradient: {
-                0.15: '#1d4ed8', // Vivid Deep Blue (Cold Mountain Belts)
-                0.35: '#06b6d4', // Bright Cyan (Cool Plateaus)
-                0.55: '#16a34a', // Emerald Green (Temperate Hills)
-                0.70: '#facc15', // Vibrant Sun Yellow (Warm Valleys)
-                0.85: '#ea580c', // Bright Amber Orange (Hot Plains)
-                1.00: '#dc2626'  // Crimson Red (Extreme Heat Zones)
-            }
+        const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgHeatmapData);
+        const thermalBounds = [[22.0, 87.5], [29.5, 97.8]];
+
+        // Attach SVG image layer directly into Leaflet map
+        L.imageOverlay(svgUrl, thermalBounds, {
+            opacity: 0.85,
+            zIndex: 350
         }).addTo(tempRadarLayer);
 
-        // Minimalist Temperature Badges
+        // Discrete Temperature Badges
         const tempTextLabels = [
             { pos: [26.18, 91.75], text: "Guwahati 33°C" },
             { pos: [27.33, 88.61], text: "Gangtok 16°C" },
@@ -417,7 +409,7 @@
                 className: 'temp-label-box',
                 html: `<div class="temp-label">${l.text}</div>`
             });
-            L.marker(l.pos, { icon: labelIcon }).addTo(tempRadarLayer);
+            L.marker(l.pos, { icon: labelIcon, zIndexOffset: 1000 }).addTo(tempRadarLayer);
         });
 
         // 5. Wind Radar
