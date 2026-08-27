@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.database import engine, Base
-from app.routers import weather, reports, risk, alerts
+from app.routes import weather, reports, risk, alerts
 
 Base.metadata.create_all(bind=engine)
 
