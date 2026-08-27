@@ -78,7 +78,6 @@
             right: 20px;
             z-index: 1000;
         }
-        /* Leaflet High-Contrast Dark Popup Overrides */
         .leaflet-popup-content-wrapper {
             background: #0f172a !important;
             color: #f8fafc !important;
@@ -311,7 +310,7 @@
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
                 rainRadar: "वर्षा राडार",
-                weatherRadar: "मौसम राडার",
+                weatherRadar: "मौसम राडार",
                 tempRadar: "विश्व तापमान राडार",
                 windRadar: "हावा राडार",
                 lightningRadar: "चट्याङ राडार",
@@ -415,7 +414,7 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. PAN-INDIA & GLOBAL TEMPERATURE RADAR
+        // 4. PAN-INDIA & GLOBAL TEMPERATURE RADAR (Live Accurate Weather Codes & Rain)
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
@@ -470,11 +469,23 @@
             return "#f87171";                // Red
         }
 
+        function getWeatherDesc(code) {
+            if (code === 0) return { icon: "☀️", text: "Clear Sky" };
+            if (code === 1 || code === 2) return { icon: "⛅", text: "Partly Cloudy" };
+            if (code === 3) return { icon: "☁️", text: "Overcast" };
+            if (code >= 45 && code <= 48) return { icon: "🌫️", text: "Fog / Mist" };
+            if (code >= 51 && code <= 55) return { icon: "🌦️", text: "Light Drizzle" };
+            if (code >= 61 && code <= 65) return { icon: "🌧️", text: "Rain Showers" };
+            if (code >= 80 && code <= 82) return { icon: "🌧️", text: "Heavy Downpour" };
+            if (code >= 95) return { icon: "⛈️", text: "Thunderstorm" };
+            return { icon: "🌤️", text: "Fair" };
+        }
+
         async function fetchLiveWeatherData() {
             try {
                 const lats = allNerStations.map(s => s.lat).join(',');
                 const lngs = allNerStations.map(s => s.lng).join(',');
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,rain,showers,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
                 
                 const res = await fetch(url);
                 const data = await res.json();
@@ -484,10 +495,14 @@
                     if (item && item.current && allNerStations[i]) {
                         allNerStations[i].temp = item.current.temperature_2m;
                         allNerStations[i].humidity = item.current.relative_humidity_2m || 75;
-                        allNerStations[i].rain = item.current.precipitation || 0;
+                        allNerStations[i].rain = item.current.precipitation ?? item.current.rain ?? 0;
                         allNerStations[i].wind = item.current.wind_speed_10m || 10;
+                        allNerStations[i].weatherCode = item.current.weather_code || 0;
                         
                         if (item.daily && item.daily.time) {
+                            allNerStations[i].todayRainSum = item.daily.precipitation_sum ? item.daily.precipitation_sum[0] : 0;
+                            allNerStations[i].todayRainProb = item.daily.precipitation_probability_max ? item.daily.precipitation_probability_max[0] : 0;
+                            
                             allNerStations[i].forecast = item.daily.time.slice(1, 4).map((d, idx) => ({
                                 date: d,
                                 max: item.daily.temperature_2m_max[idx + 1],
@@ -510,9 +525,10 @@
 
             allNerStations.forEach(s => {
                 const hex = getTempColorHex(s.temp);
+                const cond = getWeatherDesc(s.weatherCode);
                 const badgeIcon = L.divIcon({
                     className: 'temp-badge-box',
-                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${s.name} <b style="color:#ffffff;">${s.temp.toFixed(1)}°</b></div>`
+                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name} <b style="color:#ffffff;">${s.temp.toFixed(1)}°</b></div>`
                 });
 
                 const forecastHtml = (s.forecast && s.forecast.length > 0) ? `
@@ -523,7 +539,7 @@
                                 <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155;">
                                     <div style="color: #94a3b8; font-weight: 600;">${f.date.slice(5)}</div>
                                     <div style="color: #ffffff; font-weight: bold; margin: 2px 0;">${f.min}° / ${f.max}°</div>
-                                    <div style="color: #38bdf8;">💧 ${f.rainProb}%</div>
+                                    <div style="color: #38bdf8;">💧 ${f.rainProb}% (${f.rainSum.toFixed(1)}mm)</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -532,14 +548,14 @@
 
                 const marker = L.marker([s.lat, s.lng], { icon: badgeIcon, zIndexOffset: 800 })
                     .bindPopup(`
-                        <div style="font-size:12px; min-width: 220px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                        <div style="font-size:12px; min-width: 230px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                                <b style="color:${hex}; font-size:14px;">${s.name} (${s.state})</b>
-                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 10px;">LIVE</span>
+                                <b style="color:${hex}; font-size:14px;">${cond.icon} ${s.name} (${s.state})</b>
+                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${cond.text}</span>
                             </div>
                             <div style="margin-top: 6px; color: #cbd5e1; font-size: 11px; line-height: 1.6;">
                                 <div>🌡️ <span style="color: #94a3b8;">Temperature:</span> <b style="color: #ffffff; font-size: 13px;">${s.temp.toFixed(1)}°C</b></div>
-                                <div>💧 <span style="color: #94a3b8;">Precipitation:</span> <b style="color: #ffffff;">${s.rain || 0} mm/h</b></div>
+                                <div>💧 <span style="color: #94a3b8;">Today's Rain:</span> <b style="color: #38bdf8;">${s.todayRainSum ? s.todayRainSum.toFixed(1) : (s.rain || 0)} mm</b> (<span style="color:#60a5fa;">Chance: ${s.todayRainProb || 0}%</span>)</div>
                                 <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${s.wind || 12} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${s.humidity || 78}%</b></div>
                             </div>
                             ${forecastHtml}
@@ -570,22 +586,26 @@
 
                     if (searchMarker) map.removeLayer(searchMarker);
 
-                    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`);
+                    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,rain,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`);
                     const wData = await wRes.json();
                     const t = wData && wData.current ? wData.current.temperature_2m : 25;
                     const hex = getTempColorHex(t);
+                    const cond = getWeatherDesc(wData && wData.current ? wData.current.weather_code : 0);
+                    const todayRain = wData && wData.daily ? wData.daily.precipitation_sum[0] : (wData.current.precipitation || 0);
+                    const rainChance = wData && wData.daily ? wData.daily.precipitation_probability_max[0] : 0;
 
                     searchMarker = L.marker([lat, lon])
                         .addTo(map)
                         .bindPopup(`
                             <div style="font-size:12px; color:#f8fafc; min-width:210px; font-family: ui-sans-serif, system-ui, sans-serif;">
                                 <div style="border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                                    <b style="color:${hex}; font-size:14px;">📍 ${place.display_name.split(',')[0]}</b><br>
+                                    <b style="color:${hex}; font-size:14px;">📍 ${cond.icon} ${place.display_name.split(',')[0]}</b><br>
                                     <span style="color: #94a3b8; font-size: 10px;">${place.display_name}</span>
                                 </div>
                                 <div style="margin-top: 6px; font-size: 11px; line-height: 1.6; color: #cbd5e1;">
-                                    <div>🌡️ <span style="color: #94a3b8;">Live Temp:</span> <b style="color:#ffffff; font-size: 13px;">${t.toFixed(1)}°C</b></div>
-                                    <div>💧 <span style="color: #94a3b8;">Rain:</span> <b style="color:#ffffff;">${wData.current ? wData.current.precipitation : 0} mm</b> | 💨 <span style="color: #94a3b8;">Wind:</span> <b style="color:#ffffff;">${wData.current ? wData.current.wind_speed_10m : 10} km/h</b></div>
+                                    <div>🌡️ <span style="color: #94a3b8;">Live Temp:</span> <b style="color:#ffffff; font-size: 13px;">${t.toFixed(1)}°C</b> (${cond.text})</div>
+                                    <div>💧 <span style="color: #94a3b8;">Rain:</span> <b style="color:#38bdf8;">${todayRain.toFixed(1)} mm</b> (Chance: ${rainChance}%)</div>
+                                    <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color:#ffffff;">${wData.current ? wData.current.wind_speed_10m : 10} km/h</b></div>
                                 </div>
                             </div>
                         `)
@@ -598,7 +618,7 @@
             }
         }
 
-        // Global High-Contrast Click-to-Forecast
+        // Global High-Contrast Click-to-Forecast with Live Rain Accumulation
         map.on('click', async function(e) {
             if (!radars['temp'].active) return;
             const lat = e.latlng.lat;
@@ -610,31 +630,35 @@
                 .openOn(map);
 
             try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lng.toFixed(3)}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`);
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lng.toFixed(3)}&current=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`);
                 const data = await res.json();
                 
                 if (data && data.current) {
                     const t = data.current.temperature_2m;
                     const hex = getTempColorHex(t);
                     const f = data.daily;
+                    const cond = getWeatherDesc(data.current.weather_code || 0);
+                    const todayRain = f && f.precipitation_sum ? f.precipitation_sum[0] : (data.current.precipitation || 0);
+                    const todayProb = f && f.precipitation_probability_max ? f.precipitation_probability_max[0] : 0;
                     
                     popup.setContent(`
-                        <div style="font-size:12px; min-width: 220px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                        <div style="font-size:12px; min-width: 230px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                                <span style="display: flex; items-center: center; gap: 4px;">
-                                    <span>📍</span>
+                                <span style="display: flex; align-items: center; gap: 4px;">
+                                    <span>${cond.icon}</span>
                                     <b style="color:${hex}; font-size:13px;">Spot Telemetry Point</b>
                                 </span>
-                                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold;">REAL-TIME</span>
+                                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${cond.text}</span>
                             </div>
                             <div style="margin-top: 6px; color: #cbd5e1; font-size: 11px; line-height: 1.6;">
                                 <div>🌡️ <span style="color: #94a3b8;">Live Temp:</span> <b style="color: #ffffff; font-size: 13px;">${t.toFixed(1)}°C</b></div>
-                                <div>💧 <span style="color: #94a3b8;">Rain:</span> <b style="color: #ffffff;">${data.current.precipitation} mm</b> | 💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${data.current.wind_speed_10m} km/h</b></div>
+                                <div>💧 <span style="color: #94a3b8;">Today's Rain:</span> <b style="color: #38bdf8;">${todayRain.toFixed(1)} mm</b> (<span style="color:#60a5fa;">Chance: ${todayProb}%</span>)</div>
+                                <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${data.current.wind_speed_10m} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${data.current.relative_humidity_2m}%</b></div>
                                 <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Coords: ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E</div>
                             </div>
                             <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #334155; font-size: 9px; text-align: center; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Tomorrow: <b style="color: #ffffff;">${f.temperature_2m_max[1]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[1]}%</span>)</div>
-                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Day After: <b style="color: #ffffff;">${f.temperature_2m_max[2]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[2]}%</span>)</div>
+                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Tomorrow: <b style="color: #ffffff;">${f.temperature_2m_max[1]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[1]}%</span> / ${f.precipitation_sum[1].toFixed(1)}mm)</div>
+                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Day After: <b style="color: #ffffff;">${f.temperature_2m_max[2]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[2]}%</span> / ${f.precipitation_sum[2].toFixed(1)}mm)</div>
                             </div>
                         </div>
                     `);
