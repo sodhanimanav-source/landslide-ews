@@ -14,8 +14,7 @@ class HazardReportResponse(BaseModel):
     latitude: float
     longitude: float
     description: Optional[str] = None
-    created_at: Optional[datetime] = None
+    created_at: datetime
 
     class Config:
-        from_attributes = True
-        orm_mode = True
+        from_attributes = True  # 'orm_mode = True' ko rename kiya gaya hai
