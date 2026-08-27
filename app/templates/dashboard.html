@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landslide EWS — Live Animated Weather & Multi-Hazard Platform</title>
+    <title>Landslide EWS — Complete Multi-Hazard & Live Radar Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -91,17 +91,17 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
             padding: 10px 18px;
             backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
             gap: 8px;
             width: 90%;
-            max-width: 540px;
+            max-width: 520px;
         }
         .timeline-slider {
             -webkit-appearance: none;
@@ -130,6 +130,15 @@
             cursor: pointer;
             border: 2px solid #ffffff;
         }
+        .leaflet-popup-content-wrapper {
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 10px !important;
+        }
+        .leaflet-popup-tip {
+            background: #0f172a !important;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
@@ -139,7 +148,7 @@
             <span class="text-2xl">🏔️</span>
             <div>
                 <h1 id="t-title" class="font-bold text-sm md:text-base text-white">Northeast Landslide & Multi-Hazard EWS</h1>
-                <p id="t-subtitle" class="text-[11px] text-slate-400">Live Doppler Radar & Hydro-Geological Warning System</p>
+                <p id="t-subtitle" class="text-[11px] text-slate-400">Integrated Hydro-Geological Intelligence & Live Radar System</p>
             </div>
         </div>
 
@@ -174,10 +183,10 @@
                 </div>
 
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
-                    <span class="text-base">📡</span>
+                    <span class="text-base">🌊</span>
                     <div>
-                        <span id="t-radar-mode" class="font-medium text-xs block">Live Animated Doppler</span>
-                        <span class="text-[9px] text-amber-300">Real-Time Cloud & Precipitation Motion</span>
+                        <span id="t-catchment-label" class="font-medium text-xs block">Catchment Buffering</span>
+                        <span class="text-[9px] text-sky-300">Watershed Cascade Model</span>
                     </div>
                 </div>
 
@@ -194,14 +203,19 @@
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
                 </div>
 
-                <div id="btn-catchment" onclick="toggleRadar('catchment')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
+                <div id="btn-catchment" onclick="toggleRadar('catchment')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🌊</span>
                     <span id="t-catchment-radar" class="font-semibold text-xs">CatchmentRadar (Buffer)</span>
                 </div>
 
+                <div id="btn-user-reports" onclick="toggleRadar('userReports')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
+                    <span class="text-base">📍</span>
+                    <span id="t-user-reports-radar" class="font-semibold text-xs">Live User Reports</span>
+                </div>
+
                 <div id="btn-rain" onclick="toggleRadar('rain')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">💧</span>
-                    <span id="t-rain-radar" class="font-semibold text-xs">Live RainRadar (Animated)</span>
+                    <span id="t-rain-radar" class="font-semibold text-xs">RainRadar (Animated)</span>
                 </div>
 
                 <div id="btn-weather" onclick="toggleRadar('weather')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
@@ -235,14 +249,14 @@
                     <span class="bg-red-500/30 text-red-300 text-[9px] px-1.5 py-0.5 rounded font-bold">LIVE</span>
                 </div>
                 <div id="bulletin-list" class="text-[11px] space-y-1.5 pr-1">
+                    <p class="text-red-400 font-medium">🔴 Teesta Basin: 15km Downstream Buffer Breach (92%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-10 (Sevoke–Gangtok): Critical Red (91%)</p>
+                    <p class="text-red-400 font-medium">🔴 Dima Hasao Rail Basin: Track Subsidence (89%)</p>
                     <p class="text-red-400 font-medium">🔴 Chungthang–Mangan: GLOF Moraine Alert (88%)</p>
-                    <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
-                    <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
-                    <p class="text-red-400 font-medium">🔴 Dima Hasao Lumding Rail: Track Subsidence (89%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-37 (Imphal–Jiribam): Severe Mudslide (86%)</p>
                     <p class="text-red-400 font-medium">🔴 Tupul–Noney Basin: Fracture Movement (85%)</p>
-                    <p class="text-red-400 font-medium">🔴 NH-54 (Aizawl–Lunglei): Slope Failure (76%)</p>
+                    <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
                     <p class="text-amber-400 font-medium">🟡 NH-6 Sonapur Tunnel: Saturated Strata (79%)</p>
                     <p class="text-amber-400 font-medium">🟡 Trans-Arunachal (Itanagar–Ziro): Heavy Rain (58%)</p>
                     <p class="text-amber-400 font-medium">🟡 Cherrapunji Plateau: Heavy Infiltration (64%)</p>
@@ -274,7 +288,7 @@
                 <div class="h-3 w-64 md:w-80 rounded shadow-inner" style="background: linear-gradient(to right, #3b0764 0%, #1d4ed8 20%, #06b6d4 40%, #22c55e 60%, #facc15 78%, #ea580c 90%, #991b1b 100%);"></div>
             </div>
 
-            <!-- LIVE TIMELINE RADAR PLAYER (Weather & Radar / Windy Style) -->
+            <!-- LIVE TIMELINE RADAR PLAYER -->
             <div id="radar-timeline-container">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -306,14 +320,15 @@
         const i18n = {
             en: {
                 title: "Northeast Landslide & Multi-Hazard EWS",
-                subtitle: "Live Doppler Radar & Hydro-Geological Warning System",
+                subtitle: "Integrated Hydro-Geological Intelligence & Live Radar System",
                 reportBtn: "+ Report Incident",
                 myLocations: "All NER States & India",
-                radarMode: "Live Animated Doppler",
+                catchmentLabel: "Catchment Buffering",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
                 catchmentRadar: "CatchmentRadar (Buffer)",
-                rainRadar: "Live RainRadar (Animated)",
+                userReportsRadar: "Live User Reports",
+                rainRadar: "RainRadar (Animated)",
                 weatherRadar: "WeatherRadar",
                 tempRadar: "DEM TemperatureRadar",
                 windRadar: "WindRadar",
@@ -322,14 +337,15 @@
             },
             hi: {
                 title: "पूर्वोत्तर भूस्खलन एवं बहु-आपदा पूर्व चेतावनी प्रणाली",
-                subtitle: "लाइव डॉपलर रडार और हाइड्रो-भूवैज्ञानिक चेतावनी मंच",
+                subtitle: "एकीकृत भूवैज्ञानिक और डॉपलर रडार चेतावनी मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
                 myLocations: "समस्त भारत एवं पूर्वोत्तर",
-                radarMode: "लाइव एनिमेटेड डॉपलर",
+                catchmentLabel: "कैचमेंट बफरिंग",
                 pushAlerts: "सूचनाएं",
                 landslideRadar: "भूस्खलन रडार",
                 catchmentRadar: "कैचमेंट रडार",
-                rainRadar: "लाइव वर्षा रडार (एनिमेटेड)",
+                userReportsRadar: "जनता की रिपोर्ट (Live)",
+                rainRadar: "वर्षा रडार (एनिमेटेड)",
                 weatherRadar: "मौसम रडार",
                 tempRadar: "उच्च-सटीक तापमान रडार",
                 windRadar: "पवन रडार",
@@ -344,9 +360,11 @@
             document.getElementById('t-subtitle').innerText = t.subtitle;
             document.getElementById('t-report-btn').innerText = t.reportBtn;
             document.getElementById('t-my-locations').innerText = t.myLocations;
+            document.getElementById('t-catchment-label').innerText = t.catchmentLabel;
             document.getElementById('t-push-alerts').innerText = t.pushAlerts;
             document.getElementById('t-landslide-radar').innerText = t.landslideRadar;
             document.getElementById('t-catchment-radar').innerText = t.catchmentRadar;
+            document.getElementById('t-user-reports-radar').innerText = t.userReportsRadar;
             document.getElementById('t-rain-radar').innerText = t.rainRadar;
             document.getElementById('t-weather-radar').innerText = t.weatherRadar;
             document.getElementById('t-temp-radar').innerText = t.tempRadar;
@@ -356,9 +374,9 @@
         }
 
         // Initialize Map
-        const map = L.map('map', { maxZoom: 17, minZoom: 4 }).setView([26.15, 93.00], 7);
+        const map = L.map('map', { maxZoom: 18, minZoom: 4 }).setView([26.15, 93.00], 7);
 
-        // ESRI Base Map
+        // Base Maps
         const topoReliefLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 18,
             attribution: 'Tiles &copy; Esri Topo'
@@ -373,38 +391,179 @@
         });
 
         L.control.layers({
-            "🏔️ 3D Topo Relief": topoReliefLayer,
+            "🏔️ 3D Topo Relief (Pahad)": topoReliefLayer,
             "🛰️ Satellite Terrain": satelliteLayer,
             "🗺️ Dark Canvas": darkCanvasLayer
         }, null, { position: 'bottomright' }).addTo(map);
 
-        // 1. Landslide Layer
+        // 1. ALL 13 LANDSLIDE CORRIDORS & REGIONAL ZONES
         const landslideLayer = L.layerGroup().addTo(map);
         const corridors = [
             { name: "Sikkim: NH-10 (Sevoke - Gangtok)", category: "Arterial Corridor", risk: "CRITICAL RED (91%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.338, 88.606]], color: "#ef4444" },
             { name: "North Sikkim: Chungthang - Mangan Belt", category: "GLOF & Moraine Zone", risk: "CRITICAL RED (88%)", coords: [[27.500, 88.650], [27.600, 88.640], [27.700, 88.700]], color: "#ef4444" },
             { name: "Arunachal: Sela Pass - Tawang Corridor", category: "High Altitude Strategic Pass", risk: "HIGH RISK (84%)", coords: [[27.505, 92.100], [27.586, 91.865]], color: "#ef4444" },
-            { name: "Assam Dima Hasao: Lumding Rail", category: "Critical Rail Infrastructure", risk: "CRITICAL RED (89%)", coords: [[25.180, 93.020], [25.150, 93.100], [24.890, 92.850]], color: "#ef4444" },
-            { name: "Manipur: NH-37 (Imphal - Jiribam)", category: "Mudflow Corridor", risk: "CRITICAL RED (86%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" }
+            { name: "Arunachal: Trans-Arunachal (Itanagar - Ziro)", category: "Highway Valley Stretch", risk: "AMBER ADVISORY (58%)", coords: [[27.100, 93.620], [27.350, 93.750], [27.550, 93.830]], color: "#f59e0b" },
+            { name: "Nagaland: NH-29 (Chumukedima - Kohima)", category: "Fragile Shale Slopes", risk: "HIGH RISK (82%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#ef4444" },
+            { name: "Assam Dima Hasao: Lumding - Badarpur Hill Rail", category: "Critical Rail Infrastructure", risk: "CRITICAL RED (89%)", coords: [[25.180, 93.020], [25.150, 93.100], [24.890, 92.850]], color: "#ef4444" },
+            { name: "Meghalaya: NH-6 Sonapur Tunnel Zone", category: "Heavy Rainfall Tunnel Corridor", risk: "HIGH RISK (79%)", coords: [[25.200, 92.350], [25.110, 92.380]], color: "#ef4444" },
+            { name: "Meghalaya: Cherrapunji - Mawsynram Escarpment", category: "Extreme Precipitation Plateau", risk: "AMBER ADVISORY (64%)", coords: [[25.2986, 91.7302], [25.300, 91.580]], color: "#f59e0b" },
+            { name: "Manipur: NH-37 (Imphal - Jiribam Highway)", category: "Mudflow & Debris Corridor", risk: "CRITICAL RED (86%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" },
+            { name: "Manipur: Tupul - Noney Railway Basin", category: "Geological Fracture Zone", risk: "HIGH RISK (85%)", coords: [[24.710, 93.650], [24.740, 93.600]], color: "#ef4444" },
+            { name: "Mizoram: NH-54 (Aizawl - Lunglei Axis)", category: "Urban Ridge & Valley Highway", risk: "HIGH RISK (76%)", coords: [[23.727, 92.717], [23.100, 92.730], [22.880, 92.740]], color: "#ef4444" },
+            { name: "Tripura: Jampui Hills Ridge", category: "Sedimentary Formation", risk: "LOW RISK (28%)", coords: [[23.950, 92.280], [23.750, 92.290]], color: "#10b981" },
+            { name: "Meghalaya: Shillong Bypass NH-206", category: "Stable Granite Terrain", risk: "LOW RISK (22%)", coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]], color: "#10b981" }
         ];
 
         corridors.forEach(c => {
             L.polyline(c.coords, { color: c.color, weight: 6, opacity: 0.95 }).addTo(landslideLayer)
-                .bindPopup(`<b>${c.name}</b><br>Risk: <b style="color:${c.color}">${c.risk}</b>`);
+                .bindPopup(`<b>${c.name}</b><br>Type: <i>${c.category}</i><br>Risk Level: <b style="color:${c.color}">${c.risk}</b>`);
         });
 
-        // 2. Catchment Buffers
-        const catchmentLayer = L.layerGroup();
-        const catchmentBasins = [
-            { name: "Teesta Upper Basin", color: "#ef4444", coords: [[27.85, 88.40], [27.75, 88.80], [27.40, 88.75], [27.15, 88.60], [26.90, 88.45], [27.10, 88.30], [27.55, 88.25]] },
-            { name: "Dima Hasao Rail Basin", color: "#ef4444", coords: [[25.35, 92.85], [25.40, 93.30], [25.15, 93.25], [24.85, 92.95], [25.20, 92.75]] }
+        const regionZones = [
+            { pos: [27.3389, 88.6065], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
+            { pos: [25.1833, 93.0167], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
+            { pos: [23.7271, 92.7176], name: "Aizawl Urban Ridge", state: "Mizoram", desc: "Fragile shale rock & surface water infiltration risk." },
+            { pos: [27.5861, 91.8653], name: "Tawang High Plateau", state: "Arunachal", desc: "Freeze-thaw weathering and steep moraine debris." },
+            { pos: [25.6751, 94.1086], name: "Kohima Town Ridges", state: "Nagaland", desc: "Continuous road sinking & creeping slope deformation." }
         ];
-        catchmentBasins.forEach(b => {
-            L.polygon(b.coords, { color: b.color, weight: 2, fillOpacity: 0.25, dashArray: "6, 6" }).addTo(catchmentLayer)
-                .bindPopup(`<b>🌊 ${b.name}</b>`);
+
+        regionZones.forEach(z => {
+            L.circle(z.pos, { radius: 12000, color: "#f43f5e", fillColor: "#f43f5e", fillOpacity: 0.25, weight: 2 }).addTo(landslideLayer)
+                .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 3. LIVE ANIMATED RADAR TIMELINE ENGINE
+        // 2. ALL 4 CATCHMENT BASINS & DOWNSTREAM BUFFERS
+        const catchmentLayer = L.layerGroup().addTo(map);
+        const catchmentBasins = [
+            {
+                name: "Teesta Upper Basin (GLOF / Landslide Cascade)",
+                area: "12,450 km²",
+                leadTime: "3.2 Hours",
+                moistureSat: "92% (High Pore Pressure)",
+                downstreamHighway: "NH-10 (Sevoke - Gangtok)",
+                color: "#ef4444",
+                coords: [
+                    [27.85, 88.40], [27.75, 88.80], [27.40, 88.75], 
+                    [27.15, 88.60], [26.90, 88.45], [26.85, 88.35], 
+                    [27.10, 88.30], [27.55, 88.25]
+                ],
+                bufferCenter: [27.35, 88.52]
+            },
+            {
+                name: "Dima Hasao Hill Rail Catchment (Jatinga Basin)",
+                area: "4,890 km²",
+                leadTime: "2.5 Hours",
+                moistureSat: "88% (Track Subsidence Trigger)",
+                downstreamHighway: "Lumding - Badarpur Hill Section",
+                color: "#ef4444",
+                coords: [
+                    [25.35, 92.85], [25.40, 93.30], [25.15, 93.25], 
+                    [24.85, 92.95], [24.95, 92.70], [25.20, 92.75]
+                ],
+                bufferCenter: [25.15, 93.00]
+            },
+            {
+                name: "Kameng / Dikrong Strategic Catchment",
+                area: "8,920 km²",
+                leadTime: "4.0 Hours",
+                moistureSat: "74% (Moderate Debris Flow Risk)",
+                downstreamHighway: "Bhalukpong - Bomdila - Tawang Axis",
+                color: "#f59e0b",
+                coords: [
+                    [27.70, 92.10], [27.65, 92.80], [27.15, 92.90], 
+                    [26.95, 92.65], [27.05, 92.20], [27.40, 92.00]
+                ],
+                bufferCenter: [27.35, 92.45]
+            },
+            {
+                name: "Barak Tributary Catchment (Cachar - Imphal Axis)",
+                area: "6,780 km²",
+                leadTime: "3.5 Hours",
+                moistureSat: "84% (Mudslide Hazard Zone)",
+                downstreamHighway: "NH-37 (Silchar - Jiribam - Imphal)",
+                color: "#ef4444",
+                coords: [
+                    [25.05, 93.10], [25.10, 93.85], [24.65, 93.80], 
+                    [24.60, 93.15], [24.75, 92.80]
+                ],
+                bufferCenter: [24.85, 93.45]
+            }
+        ];
+
+        catchmentBasins.forEach(b => {
+            const poly = L.polygon(b.coords, {
+                color: b.color,
+                weight: 2,
+                opacity: 0.9,
+                fillColor: b.color,
+                fillOpacity: 0.22,
+                dashArray: "6, 6"
+            }).addTo(catchmentLayer);
+
+            L.circle(b.bufferCenter, {
+                radius: 18000,
+                color: b.color,
+                weight: 1.5,
+                fillColor: b.color,
+                fillOpacity: 0.12
+            }).addTo(catchmentLayer);
+
+            poly.bindPopup(`
+                <div style="font-size:12px; min-width:240px; color:#f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #334155; padding-bottom:4px;">
+                        <b style="color:${b.color}; font-size:13px;">🌊 ${b.name}</b>
+                    </div>
+                    <div style="margin-top:6px; color:#cbd5e1; font-size:11px; line-height:1.6;">
+                        <div>🗺️ <span style="color:#94a3b8;">Drainage Basin Area:</span> <b style="color:#ffffff;">${b.area}</b></div>
+                        <div>⏱️ <span style="color:#94a3b8;">Cascade Lead Time:</span> <b style="color:#facc15;">${b.leadTime}</b></div>
+                        <div>💧 <span style="color:#94a3b8;">Upstream Soil Saturation:</span> <b style="color:#38bdf8;">${b.moistureSat}</b></div>
+                        <div>🛣️ <span style="color:#94a3b8;">Downstream Impact:</span> <b style="color:#ffffff;">${b.downstreamHighway}</b></div>
+                    </div>
+                </div>
+            `);
+        });
+
+        // 3. LIVE USER-SUBMITTED HAZARD REPORTS LAYER (Database Driven /api/reports)
+        const userReportsLayer = L.layerGroup().addTo(map);
+
+        async function fetchUserSubmittedReports() {
+            try {
+                const res = await fetch('/api/reports');
+                const data = await res.json();
+                userReportsLayer.clearLayers();
+                
+                if (Array.isArray(data)) {
+                    data.forEach(r => {
+                        const icon = L.divIcon({
+                            className: 'user-report-pin',
+                            html: `<div class="pulse-cell" style="background:#dc2626; color:#fff; font-size:12px; font-weight:900; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px #f87171; border:2px solid #fff; transform: translate(-50%, -50%);">📍</div>`,
+                            iconSize: [0, 0],
+                            iconAnchor: [0, 0]
+                        });
+
+                        const dateStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recent';
+
+                        L.marker([r.latitude, r.longitude], { icon: icon }).addTo(userReportsLayer)
+                            .bindPopup(`
+                                <div style="font-size:12px; min-width:220px; color:#f8fafc;">
+                                    <b style="color:#ef4444; font-size:13px;">🚨 Crowdsourced Incident Report #${r.id}</b>
+                                    <div style="margin-top:6px; font-size:11px; color:#cbd5e1; line-height:1.5;">
+                                        <div>📍 <b>Location:</b> ${r.location_name || 'Specified Coordinates'}</div>
+                                        <div>📝 <b>Description:</b> ${r.description || 'No description provided.'}</div>
+                                        <div>🌐 <b>Coords:</b> ${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}</div>
+                                        <div style="color:#94a3b8; font-size:10px; margin-top:4px;">🕒 Submitted: ${dateStr}</div>
+                                    </div>
+                                </div>
+                            `);
+                    });
+                }
+            } catch (err) {
+                console.log("Unable to fetch live reports");
+            }
+        }
+        fetchUserSubmittedReports();
+
+        // 4. LIVE ANIMATED RADAR TIMELINE ENGINE
         const rainRadarLayer = L.layerGroup().addTo(map);
         let radarFrames = [];
         let currentFrameIndex = 0;
@@ -424,10 +583,9 @@
 
                     const slider = document.getElementById('radar-slider');
                     slider.max = radarFrames.length - 1;
-                    slider.value = data.radar.past.length - 1; // Default to 'NOW'
+                    slider.value = data.radar.past.length - 1;
                     currentFrameIndex = data.radar.past.length - 1;
 
-                    // Pre-create Tile Layers for Smooth Fast Buffering
                     radarFrames.forEach((frame, idx) => {
                         const layer = L.tileLayer(`https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
                             opacity: 0,
@@ -440,7 +598,6 @@
                     });
 
                     showFrame(currentFrameIndex);
-                    // Auto-start animated playback loop
                     startRadarPlayback();
                 }
             } catch (err) {
@@ -451,17 +608,14 @@
         function showFrame(index) {
             if (!radarFrames[index]) return;
             
-            // Hide all other frames
             Object.keys(activeTileLayers).forEach(idx => {
                 activeTileLayers[idx].setOpacity(0);
             });
 
-            // Make target frame visible
             if (activeTileLayers[index]) {
-                activeTileLayers[index].setOpacity(0.70);
+                activeTileLayers[index].setOpacity(0.65);
             }
 
-            // Update Time Badge
             const frameTime = new Date(radarFrames[index].time * 1000);
             let hours = frameTime.getHours();
             let minutes = frameTime.getMinutes();
@@ -492,7 +646,7 @@
                     nextIndex = 0;
                 }
                 showFrame(nextIndex);
-            }, 600); // Smooth 600ms frame transition
+            }, 600);
         }
 
         function stopRadarPlayback() {
@@ -509,19 +663,44 @@
             showFrame(parseInt(val));
         }
 
-        // 4. Other Layers (Weather, Temp, Wind, Lightning)
+        // 5. WEATHER, TEMPERATURE, WIND & LIGHTNING RADARS
         const weatherRadarLayer = L.layerGroup();
+        const cloudRegions = [
+            { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
+            { pos: [27.33, 88.61], r: 55000, desc: "High Himalayan Orographic Cloud Mass" },
+            { pos: [25.2986, 91.7302], r: 80000, desc: "Heavy Meghalaya Monsoon Front" }
+        ];
+        cloudRegions.forEach(c => {
+            L.circle(c.pos, { radius: c.r, color: "#94a3b8", fillColor: "#cbd5e1", fillOpacity: 0.35, weight: 1 }).addTo(weatherRadarLayer);
+        });
+
         const tempRadarLayer = L.layerGroup();
         const windRadarLayer = L.layerGroup();
         const lightningRadarLayer = L.layerGroup();
 
-        // Initialize Live Radar Animation on Load
+        const strikes = [
+            { pos: [26.15, 91.75], name: "Kamrup Microburst" },
+            { pos: [25.90, 92.40], name: "Karbi Anglong Storm" },
+            { pos: [27.10, 88.55], name: "Kalimpong Convective Cell" }
+        ];
+        strikes.forEach(st => {
+            const strikeIcon = L.divIcon({
+                className: 'strike-pin',
+                html: `<div class="pulse-cell" style="background:#eab308;color:#000;font-size:12px;font-weight:900;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #fde047;border:2px solid #fff; transform: translate(-50%, -50%);">⚡</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            });
+            L.marker(st.pos, { icon: strikeIcon }).addTo(lightningRadarLayer);
+        });
+
+        // Initialize Live Radar
         initLiveAnimatedRadar();
 
-        // Toggle Switcher
+        // Radar Layer Switcher State
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
-            'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: false },
+            'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: true },
+            'userReports': { layer: userReportsLayer, btn: 'btn-user-reports', active: true },
             'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
             'weather': { layer: weatherRadarLayer, btn: 'btn-weather', active: false },
             'temp': { layer: tempRadarLayer, btn: 'btn-temp', active: false },
@@ -543,6 +722,32 @@
                 item.active = true;
                 el.classList.add('active');
                 if (key === 'rain') timeline.style.display = 'flex';
+            }
+        }
+
+        // Global Location Search Function
+        async function searchLocation() {
+            const query = document.getElementById('village-search-input').value.trim();
+            if (!query) return;
+
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+                const results = await res.json();
+                
+                if (results && results.length > 0) {
+                    const place = results[0];
+                    const lat = parseFloat(place.lat);
+                    const lon = parseFloat(place.lon);
+
+                    map.setView([lat, lon], 12);
+                    L.marker([lat, lon]).addTo(map)
+                        .bindPopup(`<b>📍 ${place.display_name.split(',')[0]}</b><br>${place.display_name}`)
+                        .openPopup();
+                } else {
+                    alert("Location not found. Please try another pass or village name.");
+                }
+            } catch (err) {
+                alert("Search temporarily offline. Please try again.");
             }
         }
     </script>
