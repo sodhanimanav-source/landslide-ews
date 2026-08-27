@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landslide EWS — Multi-Hazard Platform</title>
+    <title>Landslide EWS — Mountain Topography & Multi-Hazard Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0b111e; }
+        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0f172a; }
         .sidebar-bg {
             background: radial-gradient(circle at 50% 50%, #165b82 0%, #0e3d59 100%);
         }
@@ -103,6 +103,22 @@
         .leaflet-popup-close-button:hover {
             color: #ffffff !important;
         }
+        /* Topo Layer Switcher Toolbar Styling */
+        .leaflet-control-layers {
+            background: rgba(15, 23, 42, 0.92) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 8px !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.6) !important;
+        }
+        .leaflet-control-layers-base label {
+            color: #f8fafc !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            cursor: pointer;
+            margin-bottom: 3px;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
@@ -147,10 +163,10 @@
                 </div>
 
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
-                    <span class="text-base">🌊</span>
+                    <span class="text-base">⛰️</span>
                     <div>
-                        <span id="t-catchment-label" class="font-medium text-xs block">Catchment Buffering</span>
-                        <span class="text-[9px] text-sky-300">Watershed Cascade Model</span>
+                        <span id="t-topo-label" class="font-medium text-xs block">3D Shaded Relief Mountain Map</span>
+                        <span class="text-[9px] text-emerald-300">USGS / ESRI Mountain Ridges</span>
                     </div>
                 </div>
 
@@ -161,13 +177,13 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Switcher Buttons -->
+                <!-- Radar Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
                 </div>
 
-                <div id="btn-catchment" onclick="toggleRadar('catchment')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
+                <div id="btn-catchment" onclick="toggleRadar('catchment')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
                     <span class="text-base">🌊</span>
                     <span id="t-catchment-radar" class="font-semibold text-xs">CatchmentRadar (Buffer)</span>
                 </div>
@@ -208,14 +224,14 @@
                     <span class="bg-red-500/30 text-red-300 text-[9px] px-1.5 py-0.5 rounded font-bold">LIVE</span>
                 </div>
                 <div id="bulletin-list" class="text-[11px] space-y-1.5 pr-1">
-                    <p class="text-red-400 font-medium">🔴 Teesta Basin: 15km Downstream Buffer Breach (92%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-10 (Sevoke–Gangtok): Critical Red (91%)</p>
-                    <p class="text-red-400 font-medium">🔴 Dima Hasao Rail Basin: Track Subsidence (89%)</p>
                     <p class="text-red-400 font-medium">🔴 Chungthang–Mangan: GLOF Moraine Alert (88%)</p>
-                    <p class="text-red-400 font-medium">🔴 NH-37 (Imphal–Jiribam): Severe Mudslide (86%)</p>
-                    <p class="text-red-400 font-medium">🔴 Tupul–Noney Basin: Fracture Movement (85%)</p>
                     <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
+                    <p class="text-red-400 font-medium">🔴 Dima Hasao Lumding Rail: Track Subsidence (89%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-37 (Imphal–Jiribam): Severe Mudslide (86%)</p>
+                    <p class="text-red-400 font-medium">🔴 Tupul–Noney Basin: Fracture Movement (85%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-54 (Aizawl–Lunglei): Slope Failure (76%)</p>
                     <p class="text-amber-400 font-medium">🟡 NH-6 Sonapur Tunnel: Saturated Strata (79%)</p>
                     <p class="text-amber-400 font-medium">🟡 Trans-Arunachal (Itanagar–Ziro): Heavy Rain (58%)</p>
                     <p class="text-amber-400 font-medium">🟡 Cherrapunji Plateau: Heavy Infiltration (64%)</p>
@@ -235,7 +251,7 @@
                 <button onclick="searchLocation()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
             </div>
 
-            <!-- SatFish Style Global Calibration Legend -->
+            <!-- Calibration Legend -->
             <div id="satfish-legend">
                 <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
                     <span>-5°C (Cryo)</span>
@@ -257,7 +273,7 @@
                 subtitle: "Integrated Hydro-Geological Intelligence Platform",
                 reportBtn: "+ Report Incident",
                 myLocations: "All NER States & India",
-                weatherLoc: "Catchment Buffering Active",
+                topoLabel: "3D Shaded Relief Mountain Map",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
                 catchmentRadar: "CatchmentRadar (Buffer)",
@@ -273,11 +289,11 @@
                 subtitle: "एकीकृत भूवैज्ञानिक और हाइड्रो-खुफिया मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
                 myLocations: "समस्त भारत एवं पूर्वोत्तर",
-                weatherLoc: "कैचमेंट बफरिंग सक्रिय",
+                topoLabel: "3D पर्वत रिलीफ मानचित्र",
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार",
                 catchmentRadar: "कैचमेंट रडार (बफरिंग)",
-                rainRadar: "वर्षा रडार",
+                rainRadar: "वर्षा रडar",
                 weatherRadar: "मौसम रडार",
                 tempRadar: "उच्च-सटीक तापमान रडार",
                 windRadar: "पवन रडार",
@@ -289,7 +305,7 @@
                 subtitle: "সমন্বিত হাইড্ৰ'-ভূতাত্ত্বিক চোৰাংচোৱা মঞ্চ",
                 reportBtn: "+ ঘটনা ৰিপৰ্ট কৰক",
                 myLocations: "সকলো ৰাজ্য আৰু ভাৰত",
-                weatherLoc: "কেচমেণ্ট বাফাৰিং সক্ৰিয়",
+                topoLabel: "পৰ্বত ৰিলিফ মানচিত্ৰ",
                 pushAlerts: "জাননী (Push Notifications)",
                 landslideRadar: "ভূমিস্খলন ৰাডাৰ",
                 catchmentRadar: "কেচমেণ্ট বাফাৰ ৰাডাৰ",
@@ -305,7 +321,7 @@
                 subtitle: "সমন্বিত ভূতাত্ত্বিক ও ডপলার পর্যবেক্ষণ প্ল্যাটফর্ম",
                 reportBtn: "+ ঘটনা রিপোর্ট করুন",
                 myLocations: "উত্তর-পূর্ব ও সমগ্র ভারত",
-                weatherLoc: "ক্যাচমেন্ট বাফারিং সক্রিয়",
+                topoLabel: "পাহাড় রিলিফ মানচিত্র",
                 pushAlerts: "বিজ্ঞপ্তি (Push Notifications)",
                 landslideRadar: "ভূমিধস রাডার",
                 catchmentRadar: "ক্যাচমেন্ট বাফার রাডার",
@@ -321,7 +337,7 @@
                 subtitle: "एकीकृत भू-वैज्ञानिक गुप्तचर मञ्च",
                 reportBtn: "+ घटना रिपोर्ट गर्नुहोस्",
                 myLocations: "सबै राज्यहरू तथा भारत",
-                weatherLoc: "क्याचमेन्ट बफरिङ सक्रिय",
+                topoLabel: "पहाड रिलीफ नक्सा",
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
                 catchmentRadar: "क्याचमेन्ट बफर राडार",
@@ -340,7 +356,7 @@
             document.getElementById('t-subtitle').innerText = t.subtitle;
             document.getElementById('t-report-btn').innerText = t.reportBtn;
             document.getElementById('t-my-locations').innerText = t.myLocations;
-            document.getElementById('t-weather-loc').innerText = t.weatherLoc;
+            document.getElementById('t-topo-label').innerText = t.topoLabel;
             document.getElementById('t-push-alerts').innerText = t.pushAlerts;
             document.getElementById('t-landslide-radar').innerText = t.landslideRadar;
             document.getElementById('t-catchment-radar').innerText = t.catchmentRadar;
@@ -355,17 +371,37 @@
         // Initialize Map
         const map = L.map('map', { maxZoom: 19, minZoom: 3 }).setView([26.15, 93.00], 7);
 
-        // ESRI Base Map
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 16,
-            attribution: 'Tiles &copy; Esri'
+        // 1. Shaded Relief Topography (Primary Default Map with Mountain Shading)
+        const topoReliefLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Tiles &copy; Esri Topo'
         }).addTo(map);
 
-        // Reference Labels
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+        // 2. High-Res Satellite Imagery
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Tiles &copy; Esri Imagery'
+        });
+
+        // 3. Dark Tactical Canvas
+        const darkCanvasLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16,
+            attribution: 'Tiles &copy; Esri Dark'
+        });
+
+        // Topographic Reference Labels
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 18,
             zIndex: 400
         }).addTo(map);
+
+        // Base Map Switcher Control
+        const baseMaps = {
+            "🏔️ 3D Topo Relief (Pahad)": topoReliefLayer,
+            "🛰️ Satellite Terrain": satelliteLayer,
+            "🗺️ Dark Canvas": darkCanvasLayer
+        };
+        L.control.layers(baseMaps, null, { position: 'bottomright' }).addTo(map);
 
         // 1. Full Pan-NER Landslide Layer
         const landslideLayer = L.layerGroup().addTo(map);
@@ -404,8 +440,8 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. MULTI-HAZARD CATCHMENT BUFFERING ENGINE (Dynamic River Basin Cascades)
-        const catchmentLayer = L.layerGroup().addTo(map);
+        // 2. Catchment Buffers (Default Off taaki map clean rahe)
+        const catchmentLayer = L.layerGroup();
 
         const catchmentBasins = [
             {
@@ -464,7 +500,6 @@
         ];
 
         catchmentBasins.forEach(b => {
-            // Semi-transparent polygon showing the exact watershed drainage basin
             const poly = L.polygon(b.coords, {
                 color: b.color,
                 weight: 2,
@@ -474,7 +509,6 @@
                 dashArray: "6, 6"
             }).addTo(catchmentLayer);
 
-            // Cascading Downstream Buffer Corridor Ring
             L.circle(b.bufferCenter, {
                 radius: 18000,
                 color: b.color,
@@ -862,10 +896,10 @@
                 .bindPopup(`<b>⚡ Severe Lightning Strike</b><br>Location: ${st.name}`);
         });
 
-        // Toggle Switcher
+        // Toggle Switcher (Catchment Radar ko default inactive rakha hai taaki pahad clear dikhe)
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
-            'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: true },
+            'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: false },
             'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
             'weather': { layer: weatherRadarLayer, btn: 'btn-weather', active: false },
             'temp': { layer: tempRadarLayer, btn: 'btn-temp', active: false },
