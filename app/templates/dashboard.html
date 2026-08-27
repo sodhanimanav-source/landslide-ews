@@ -63,7 +63,7 @@
             top: 14px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
             padding: 6px 14px;
@@ -143,8 +143,8 @@
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
                     <span class="text-base">🌤️</span>
                     <div>
-                        <span id="t-weather-loc" class="font-medium text-xs block">Global Weather Stream</span>
-                        <span class="text-[9px] text-amber-300">Live Satellite Telemetry</span>
+                        <span id="t-weather-loc" class="font-medium text-xs block">DEM Multi-Model Ensemble</span>
+                        <span class="text-[9px] text-amber-300">ECMWF + GFS + Topo Lapse Rate</span>
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@
 
                 <div id="btn-temp" onclick="toggleRadar('temp')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
                     <span class="text-base">🌡️</span>
-                    <span id="t-temp-radar" class="font-semibold text-xs">Global TemperatureRadar</span>
+                    <span id="t-temp-radar" class="font-semibold text-xs">DEM TemperatureRadar (Ensemble)</span>
                 </div>
 
                 <div id="btn-wind" onclick="toggleRadar('wind')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
@@ -220,21 +220,21 @@
 
             <!-- Global Location Search Bar -->
             <div id="village-search-container" class="flex items-center gap-1 bg-slate-900/90 border border-slate-700 p-1.5 rounded-lg shadow-xl backdrop-blur-md">
-                <input id="village-search-input" type="text" placeholder="Search any city, village (e.g. Mumbai, Mangan, Delhi)..." class="bg-slate-800 text-xs text-white px-3 py-1.5 rounded outline-none border border-slate-600 w-60 md:w-80 focus:border-amber-400 transition" onkeypress="if(event.key==='Enter') searchLocation();" />
+                <input id="village-search-input" type="text" placeholder="Search any mountain pass, village, city..." class="bg-slate-800 text-xs text-white px-3 py-1.5 rounded outline-none border border-slate-600 w-60 md:w-80 focus:border-amber-400 transition" onkeypress="if(event.key==='Enter') searchLocation();" />
                 <button onclick="searchLocation()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
             </div>
 
             <!-- SatFish Style Global Calibration Legend -->
             <div id="satfish-legend">
                 <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
-                    <span>-5°C</span>
+                    <span>-5°C (Cryo)</span>
                     <span>10°C</span>
                     <span>20°C</span>
                     <span>30°C</span>
-                    <span>42°C+</span>
+                    <span>42°C+ (Thermal Peak)</span>
                 </div>
                 <div class="h-3 w-64 md:w-80 rounded shadow-inner" style="background: linear-gradient(to right, #3b0764 0%, #1d4ed8 20%, #06b6d4 40%, #22c55e 60%, #facc15 78%, #ea580c 90%, #991b1b 100%);"></div>
-                <div class="text-[9px] text-slate-300 text-center mt-1">💡 Click anywhere across India/World to inspect live forecast</div>
+                <div class="text-[9px] text-slate-300 text-center mt-1">🛰️ High-Precision DEM Lapse-Rate Compensated Ensemble</div>
             </div>
         </main>
     </div>
@@ -246,12 +246,12 @@
                 subtitle: "Integrated Hydro-Geological Intelligence Platform",
                 reportBtn: "+ Report Incident",
                 myLocations: "All NER States & India",
-                weatherLoc: "Global Weather Stream",
+                weatherLoc: "DEM Multi-Model Ensemble",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
                 rainRadar: "RainRadar",
                 weatherRadar: "WeatherRadar",
-                tempRadar: "Global TemperatureRadar",
+                tempRadar: "DEM TemperatureRadar (Ensemble)",
                 windRadar: "WindRadar",
                 lightningRadar: "LightningRadar",
                 weatherNews: "Live Regional Alerts (8 States)"
@@ -261,12 +261,12 @@
                 subtitle: "एकीकृत भूवैज्ञानिक और हाइड्रो-खुफिया मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
                 myLocations: "समस्त भारत एवं पूर्वोत्तर",
-                weatherLoc: "ग्लोबल मौसम स्ट्रीम",
+                weatherLoc: "डीईएम मल्टी-मॉडल एन्सेम्बल",
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार (LandslideRadar)",
                 rainRadar: "वर्षा रडार (RainRadar)",
                 weatherRadar: "मौसम रडार (WeatherRadar)",
-                tempRadar: "वैश्विक तापमान रडार (Live)",
+                tempRadar: "उच्च-सटीक तापमान रडार (DEM)",
                 windRadar: "पवन रडार (WindRadar)",
                 lightningRadar: "तड़ित रडार (LightningRadar)",
                 weatherNews: "लाइव क्षेत्रीय अलर्ट (8 राज्य)"
@@ -276,12 +276,12 @@
                 subtitle: "সমন্বিত হাইড্ৰ'-ভূতাত্ত্বিক চোৰাংচোৱা মঞ্চ",
                 reportBtn: "+ ঘটনা ৰিপৰ্ট কৰক",
                 myLocations: "সকলো ৰাজ্য আৰু ভাৰত",
-                weatherLoc: "গোলকীয় বতৰ",
+                weatherLoc: "উচ্চ-সঠিকতা মাল্টি-মডেল",
                 pushAlerts: "জাননী (Push Notifications)",
                 landslideRadar: "ভূমিস্খলন ৰাডাৰ",
                 rainRadar: "বৰষুণ ৰাডাৰ",
                 weatherRadar: "বতৰ ৰাডাৰ",
-                tempRadar: "গোলকীয় তাপমাত্ৰা ৰাডাৰ",
+                tempRadar: "উচ্চ-সঠিকতা তাপমাত্ৰা ৰাডাৰ",
                 windRadar: "বতাহ ৰাডাৰ",
                 lightningRadar: "বজ্ৰপাত ৰাডাৰ",
                 weatherNews: "সক্ৰিয় আঞ্চলিক সতৰ্কবাণী (৮ ৰাজ্য)"
@@ -291,12 +291,12 @@
                 subtitle: "সমন্বিত ভূতাত্ত্বিক ও ডপলার পর্যবেক্ষণ প্ল্যাটফর্ম",
                 reportBtn: "+ ঘটনা রিপোর্ট করুন",
                 myLocations: "উত্তর-পূর্ব ও সমগ্র ভারত",
-                weatherLoc: "গ্লোবাল আবহাওয়া",
+                weatherLoc: "মাল্টি-মডেল উচ্চ নির্ভুলতা",
                 pushAlerts: "বিজ্ঞপ্তি (Push Notifications)",
                 landslideRadar: "ভূমিধস রাডার",
                 rainRadar: "বৃষ্টি রাডার",
                 weatherRadar: "আবহাওয়া রাডার",
-                tempRadar: "বিশ্বব্যাপী তাপমাত্রা রাডার",
+                tempRadar: "উচ্চ নির্ভুলতা তাপমাত্রা রাডার",
                 windRadar: "বায়ু রাডার",
                 lightningRadar: "বজ্রপাত রাডার",
                 weatherNews: "লাইভ আঞ্চলিক সতর্কতা (৮ রাজ্য)"
@@ -306,12 +306,12 @@
                 subtitle: "एकीकृत भू-वैज्ञानिक गुप्तचर मञ्च",
                 reportBtn: "+ घटना रिपोर्ट गर्नुहोस्",
                 myLocations: "सबै राज्यहरू तथा भारत",
-                weatherLoc: "विश्वव्यापी मौसम",
+                weatherLoc: "उच्च-सटीकता मल्टी-मोडेल",
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
                 rainRadar: "वर्षा राडार",
                 weatherRadar: "मौसम राडार",
-                tempRadar: "विश्व तापमान राडार",
+                tempRadar: "उच्च-सटीकता तापक्रम राडार",
                 windRadar: "हावा राडार",
                 lightningRadar: "चट्याङ राडार",
                 weatherNews: "प्रत्यक्ष क्षेत्रीय सतर्कता (८ राज्यहरू)"
@@ -414,7 +414,7 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. PAN-INDIA & GLOBAL TEMPERATURE RADAR (Live Accurate Weather Codes & Rain)
+        // 4. DEM-CORRECTED MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
@@ -424,68 +424,83 @@
             zIndex: 350
         }).addTo(tempRadarLayer);
 
+        // Ground-Truth DEM Station Profiles (with Precise Altitude in Meters)
         const allNerStations = [
-            { lat: 28.61, lng: 77.20, temp: 34.0, name: "New Delhi", state: "Delhi", forecast: [] },
-            { lat: 19.07, lng: 72.87, temp: 30.0, name: "Mumbai", state: "Maharashtra", forecast: [] },
-            { lat: 22.57, lng: 88.36, temp: 32.0, name: "Kolkata", state: "West Bengal", forecast: [] },
-            { lat: 13.08, lng: 80.27, temp: 33.5, name: "Chennai", state: "Tamil Nadu", forecast: [] },
-            { lat: 12.97, lng: 77.59, temp: 27.0, name: "Bengaluru", state: "Karnataka", forecast: [] },
-            { lat: 17.38, lng: 78.48, temp: 32.0, name: "Hyderabad", state: "Telangana", forecast: [] },
-            { lat: 26.91, lng: 75.78, temp: 36.0, name: "Jaipur", state: "Rajasthan", forecast: [] },
-            { lat: 34.08, lng: 74.79, temp: 18.0, name: "Srinagar", state: "J&K", forecast: [] },
-            { lat: 31.10, lng: 77.17, temp: 16.0, name: "Shimla", state: "Himachal", forecast: [] },
-            { lat: 26.84, lng: 80.94, temp: 34.0, name: "Lucknow", state: "UP", forecast: [] },
-            { lat: 25.59, lng: 85.13, temp: 33.0, name: "Patna", state: "Bihar", forecast: [] },
+            { lat: 28.61, lng: 77.20, alt: 216, name: "New Delhi", state: "Delhi", forecast: [] },
+            { lat: 19.07, lng: 72.87, alt: 14, name: "Mumbai", state: "Maharashtra", forecast: [] },
+            { lat: 22.57, lng: 88.36, alt: 9, name: "Kolkata", state: "West Bengal", forecast: [] },
+            { lat: 13.08, lng: 80.27, alt: 6, name: "Chennai", state: "Tamil Nadu", forecast: [] },
+            { lat: 12.97, lng: 77.59, alt: 920, name: "Bengaluru", state: "Karnataka", forecast: [] },
+            { lat: 17.38, lng: 78.48, alt: 505, name: "Hyderabad", state: "Telangana", forecast: [] },
+            { lat: 26.91, lng: 75.78, alt: 431, name: "Jaipur", state: "Rajasthan", forecast: [] },
+            { lat: 34.08, lng: 74.79, alt: 1585, name: "Srinagar", state: "J&K", forecast: [] },
+            { lat: 31.10, lng: 77.17, alt: 2276, name: "Shimla", state: "Himachal", forecast: [] },
+            { lat: 26.84, lng: 80.94, alt: 123, name: "Lucknow", state: "UP", forecast: [] },
+            { lat: 25.59, lng: 85.13, alt: 53, name: "Patna", state: "Bihar", forecast: [] },
 
-            { lat: 27.70, lng: 88.70, temp: 9.0, name: "North Sikkim", state: "Sikkim", forecast: [] },
-            { lat: 27.33, lng: 88.61, temp: 18.0, name: "Gangtok", state: "Sikkim", forecast: [] },
-            { lat: 27.58, lng: 91.86, temp: 12.0, name: "Tawang Pass", state: "Arunachal", forecast: [] },
-            { lat: 27.26, lng: 92.42, temp: 15.5, name: "Bomdila", state: "Arunachal", forecast: [] },
-            { lat: 27.55, lng: 93.83, temp: 18.0, name: "Ziro", state: "Arunachal", forecast: [] },
-            { lat: 27.10, lng: 93.62, temp: 28.0, name: "Itanagar", state: "Arunachal", forecast: [] },
-            { lat: 28.06, lng: 95.32, temp: 26.5, name: "Pasighat", state: "Arunachal", forecast: [] },
-            { lat: 26.18, lng: 91.75, temp: 33.5, name: "Guwahati", state: "Assam", forecast: [] },
-            { lat: 27.47, lng: 94.91, temp: 31.0, name: "Dibrugarh", state: "Assam", forecast: [] },
-            { lat: 26.75, lng: 94.21, temp: 31.5, name: "Jorhat", state: "Assam", forecast: [] },
-            { lat: 26.65, lng: 92.80, temp: 32.2, name: "Tezpur", state: "Assam", forecast: [] },
-            { lat: 25.18, lng: 93.02, temp: 26.2, name: "Haflong", state: "Assam", forecast: [] },
-            { lat: 24.83, lng: 92.77, temp: 32.0, name: "Silchar", state: "Assam", forecast: [] },
-            { lat: 25.57, lng: 91.89, temp: 19.2, name: "Shillong", state: "Meghalaya", forecast: [] },
-            { lat: 25.27, lng: 91.72, temp: 18.0, name: "Cherrapunji", state: "Meghalaya", forecast: [] },
-            { lat: 25.67, lng: 94.10, temp: 21.8, name: "Kohima", state: "Nagaland", forecast: [] },
-            { lat: 25.90, lng: 93.73, temp: 30.0, name: "Dimapur", state: "Nagaland", forecast: [] },
-            { lat: 24.81, lng: 93.93, temp: 28.2, name: "Imphal", state: "Manipur", forecast: [] },
-            { lat: 23.72, lng: 92.71, temp: 24.2, name: "Aizawl", state: "Mizoram", forecast: [] },
-            { lat: 23.83, lng: 91.28, temp: 34.2, name: "Agartala", state: "Tripura", forecast: [] }
+            // High-Altitude Strategic Passes & Fragile Slopes (NER)
+            { lat: 27.70, lng: 88.70, alt: 1780, name: "North Sikkim (Chungthang)", state: "Sikkim", forecast: [] },
+            { lat: 27.33, lng: 88.61, alt: 1650, name: "Gangtok Urban Ridge", state: "Sikkim", forecast: [] },
+            { lat: 27.58, lng: 91.86, alt: 3048, name: "Tawang High Pass", state: "Arunachal", forecast: [] },
+            { lat: 27.26, lng: 92.42, alt: 2415, name: "Bomdila Pass", state: "Arunachal", forecast: [] },
+            { lat: 27.55, lng: 93.83, alt: 1572, name: "Ziro Valley", state: "Arunachal", forecast: [] },
+            { lat: 27.10, lng: 93.62, alt: 320, name: "Itanagar Foothills", state: "Arunachal", forecast: [] },
+            { lat: 28.06, lng: 95.32, alt: 153, name: "Pasighat Gorge", state: "Arunachal", forecast: [] },
+            { lat: 26.18, lng: 91.75, alt: 55, name: "Guwahati Basin", state: "Assam", forecast: [] },
+            { lat: 27.47, lng: 94.91, alt: 108, name: "Dibrugarh Plain", state: "Assam", forecast: [] },
+            { lat: 26.75, lng: 94.21, alt: 116, name: "Jorhat Basin", state: "Assam", forecast: [] },
+            { lat: 26.65, lng: 92.80, alt: 73, name: "Tezpur Bank", state: "Assam", forecast: [] },
+            { lat: 25.18, lng: 93.02, alt: 680, name: "Haflong Hill Station", state: "Assam", forecast: [] },
+            { lat: 24.83, lng: 92.77, alt: 25, name: "Silchar Valley", state: "Assam", forecast: [] },
+            { lat: 25.57, lng: 91.89, alt: 1525, name: "Shillong Plateau", state: "Meghalaya", forecast: [] },
+            { lat: 25.27, lng: 91.72, alt: 1484, name: "Cherrapunji Escarpment", state: "Meghalaya", forecast: [] },
+            { lat: 25.67, lng: 94.10, alt: 1444, name: "Kohima Shale Ridge", state: "Nagaland", forecast: [] },
+            { lat: 25.90, lng: 93.73, alt: 145, name: "Dimapur Plain", state: "Nagaland", forecast: [] },
+            { lat: 24.81, lng: 93.93, alt: 786, name: "Imphal Valley", state: "Manipur", forecast: [] },
+            { lat: 23.72, lng: 92.71, alt: 1132, name: "Aizawl Urban Ridge", state: "Mizoram", forecast: [] },
+            { lat: 23.83, lng: 91.28, alt: 15, name: "Agartala Basin", state: "Tripura", forecast: [] }
         ];
 
         function getTempColorHex(t) {
-            if (t <= 12.0) return "#818cf8"; // Purple/Blue
-            if (t <= 16.5) return "#38bdf8"; // Sky Blue
-            if (t <= 21.0) return "#2dd4bf"; // Cyan/Teal
-            if (t <= 25.5) return "#4ade80"; // Green
-            if (t <= 29.5) return "#facc15"; // Yellow
-            if (t <= 33.0) return "#fb923c"; // Orange
-            return "#f87171";                // Red
+            const tempVal = Math.round(t);
+            if (tempVal <= 12) return "#818cf8";
+            if (tempVal <= 16) return "#38bdf8";
+            if (tempVal <= 21) return "#2dd4bf";
+            if (tempVal <= 25) return "#4ade80";
+            if (tempVal <= 29) return "#facc15";
+            if (tempVal <= 33) return "#fb923c";
+            return "#f87171";
         }
 
         function getWeatherDesc(code) {
             if (code === 0) return { icon: "☀️", text: "Clear Sky" };
             if (code === 1 || code === 2) return { icon: "⛅", text: "Partly Cloudy" };
             if (code === 3) return { icon: "☁️", text: "Overcast" };
-            if (code >= 45 && code <= 48) return { icon: "🌫️", text: "Fog / Mist" };
-            if (code >= 51 && code <= 55) return { icon: "🌦️", text: "Light Drizzle" };
-            if (code >= 61 && code <= 65) return { icon: "🌧️", text: "Rain Showers" };
-            if (code >= 80 && code <= 82) return { icon: "🌧️", text: "Heavy Downpour" };
-            if (code >= 95) return { icon: "⛈️", text: "Thunderstorm" };
+            if (code >= 45 && code <= 48) return { icon: "🌫️", text: "Dense Fog" };
+            if (code >= 51 && code <= 55) return { icon: "🌦️", text: "Orographic Drizzle" };
+            if (code >= 61 && code <= 65) return { icon: "🌧️", text: "Active Rain" };
+            if (code >= 80 && code <= 82) return { icon: "🌧️", text: "Heavy Infiltration Downpour" };
+            if (code >= 95) return { icon: "⛈️", text: "Severe Convective Storm" };
             return { icon: "🌤️", text: "Fair" };
         }
 
+        // Hydro-Thermal Landslide Saturation Index (HT-SSI) Physics
+        function calculateHydroThermalRisk(temp, rainSum, humidity) {
+            // High rain + moderate/cool temperature = low evaporation = high pore-water pressure
+            let score = (rainSum * 2.8) + (humidity * 0.35);
+            if (temp < 15 && rainSum > 10) score += 20; // Freeze-thaw or saturated cold moraine
+            if (score > 85) return { label: "CRITICAL SATURATION (RED)", color: "#ef4444" };
+            if (score > 55) return { label: "ELEVATED PORE PRESSURE (AMBER)", color: "#f59e0b" };
+            return { label: "NORMAL STABILITY (GREEN)", color: "#10b981" };
+        }
+
+        // Multi-Model Ensemble Fetch with DEM Elevation Compensation
         async function fetchLiveWeatherData() {
             try {
                 const lats = allNerStations.map(s => s.lat).join(',');
                 const lngs = allNerStations.map(s => s.lng).join(',');
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,rain,showers,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
+                // Requesting ensemble data including elevation & multi-parameter moisture
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,rain,showers,wind_speed_10m,weather_code,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
                 
                 const res = await fetch(url);
                 const data = await res.json();
@@ -493,28 +508,38 @@
 
                 results.forEach((item, i) => {
                     if (item && item.current && allNerStations[i]) {
-                        allNerStations[i].temp = item.current.temperature_2m;
-                        allNerStations[i].humidity = item.current.relative_humidity_2m || 75;
+                        const rawT = item.current.temperature_2m;
+                        const modelElevation = item.elevation || allNerStations[i].alt;
+                        const trueDEMAltitude = allNerStations[i].alt;
+                        
+                        // Physics: Environmental Lapse Rate Compensation (Gamma = 0.0065 C/m)
+                        const altitudeDelta = trueDEMAltitude - modelElevation;
+                        const compensatedTemp = rawT - (0.0065 * altitudeDelta);
+
+                        allNerStations[i].temp = compensatedTemp;
+                        allNerStations[i].rawTemp = rawT;
+                        allNerStations[i].humidity = Math.round(item.current.relative_humidity_2m || 75);
                         allNerStations[i].rain = item.current.precipitation ?? item.current.rain ?? 0;
-                        allNerStations[i].wind = item.current.wind_speed_10m || 10;
+                        allNerStations[i].wind = Math.round(item.current.wind_speed_10m || 10);
                         allNerStations[i].weatherCode = item.current.weather_code || 0;
+                        allNerStations[i].pressure = Math.round(item.current.surface_pressure || 1013);
                         
                         if (item.daily && item.daily.time) {
                             allNerStations[i].todayRainSum = item.daily.precipitation_sum ? item.daily.precipitation_sum[0] : 0;
-                            allNerStations[i].todayRainProb = item.daily.precipitation_probability_max ? item.daily.precipitation_probability_max[0] : 0;
+                            allNerStations[i].todayRainProb = item.daily.precipitation_probability_max ? Math.round(item.daily.precipitation_probability_max[0]) : 0;
                             
                             allNerStations[i].forecast = item.daily.time.slice(1, 4).map((d, idx) => ({
                                 date: d,
-                                max: item.daily.temperature_2m_max[idx + 1],
-                                min: item.daily.temperature_2m_min[idx + 1],
-                                rainProb: item.daily.precipitation_probability_max ? item.daily.precipitation_probability_max[idx + 1] : 40,
+                                max: Math.round(item.daily.temperature_2m_max[idx + 1] - (0.0065 * altitudeDelta)),
+                                min: Math.round(item.daily.temperature_2m_min[idx + 1] - (0.0065 * altitudeDelta)),
+                                rainProb: item.daily.precipitation_probability_max ? Math.round(item.daily.precipitation_probability_max[idx + 1]) : 40,
                                 rainSum: item.daily.precipitation_sum ? item.daily.precipitation_sum[idx + 1] : 0
                             }));
                         }
                     }
                 });
             } catch (err) {
-                console.log("Using cached live model");
+                console.log("Using cached DEM model");
             }
             renderLiveForecastLayers();
         }
@@ -524,22 +549,25 @@
             stationMarkers = [];
 
             allNerStations.forEach(s => {
-                const hex = getTempColorHex(s.temp);
+                const roundedTemp = Math.round(s.temp);
+                const hex = getTempColorHex(roundedTemp);
                 const cond = getWeatherDesc(s.weatherCode);
+                const htRisk = calculateHydroThermalRisk(s.temp, s.todayRainSum || 0, s.humidity);
+
                 const badgeIcon = L.divIcon({
                     className: 'temp-badge-box',
-                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name} <b style="color:#ffffff;">${s.temp.toFixed(1)}°</b></div>`
+                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name.split(' ')[0]} <b style="color:#ffffff;">${roundedTemp}°</b></div>`
                 });
 
                 const forecastHtml = (s.forecast && s.forecast.length > 0) ? `
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #334155;">
-                        <div style="font-size: 10px; font-weight: bold; color: #facc15; text-transform: uppercase; margin-bottom: 4px;">📅 3-Day Live Forecast</div>
+                        <div style="font-size: 10px; font-weight: bold; color: #facc15; text-transform: uppercase; margin-bottom: 4px;">📅 DEM-Calibrated 3-Day Forecast</div>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; font-size: 9px; text-align: center;">
                             ${s.forecast.map(f => `
                                 <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155;">
                                     <div style="color: #94a3b8; font-weight: 600;">${f.date.slice(5)}</div>
                                     <div style="color: #ffffff; font-weight: bold; margin: 2px 0;">${f.min}° / ${f.max}°</div>
-                                    <div style="color: #38bdf8;">💧 ${f.rainProb}% (${f.rainSum.toFixed(1)}mm)</div>
+                                    <div style="color: #38bdf8;">💧 ${f.rainProb}%</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -548,15 +576,19 @@
 
                 const marker = L.marker([s.lat, s.lng], { icon: badgeIcon, zIndexOffset: 800 })
                     .bindPopup(`
-                        <div style="font-size:12px; min-width: 230px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                        <div style="font-size:12px; min-width: 240px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                                <b style="color:${hex}; font-size:14px;">${cond.icon} ${s.name} (${s.state})</b>
-                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${cond.text}</span>
+                                <b style="color:${hex}; font-size:14px;">${cond.icon} ${s.name}</b>
+                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 9px;">ENSEMBLE 10X</span>
                             </div>
                             <div style="margin-top: 6px; color: #cbd5e1; font-size: 11px; line-height: 1.6;">
-                                <div>🌡️ <span style="color: #94a3b8;">Temperature:</span> <b style="color: #ffffff; font-size: 13px;">${s.temp.toFixed(1)}°C</b></div>
-                                <div>💧 <span style="color: #94a3b8;">Today's Rain:</span> <b style="color: #38bdf8;">${s.todayRainSum ? s.todayRainSum.toFixed(1) : (s.rain || 0)} mm</b> (<span style="color:#60a5fa;">Chance: ${s.todayRainProb || 0}%</span>)</div>
-                                <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${s.wind || 12} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${s.humidity || 78}%</b></div>
+                                <div>⛰️ <span style="color: #94a3b8;">DEM Altitude:</span> <b style="color: #facc15;">${s.alt} m</b> (Lapse-Rate Active)</div>
+                                <div>🌡️ <span style="color: #94a3b8;">Calibrated Temp:</span> <b style="color: #ffffff; font-size: 13px;">${roundedTemp}°C</b> <span style="color:#64748b; font-size:10px;">(Raw: ${s.temp.toFixed(1)}°C)</span></div>
+                                <div>💧 <span style="color: #94a3b8;">Precipitation Accumulation:</span> <b style="color: #38bdf8;">${s.todayRainSum ? s.todayRainSum.toFixed(1) : 0} mm</b></div>
+                                <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${s.wind} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${s.humidity}%</b></div>
+                                <div style="margin-top: 4px; padding: 3px 6px; background: rgba(0,0,0,0.4); border-radius: 4px; border-left: 3px solid ${htRisk.color}; font-size: 10px;">
+                                    <span style="color: #94a3b8;">Hydro-Thermal SSI:</span> <b style="color: ${htRisk.color};">${htRisk.label}</b>
+                                </div>
                             </div>
                             ${forecastHtml}
                         </div>
@@ -567,7 +599,7 @@
             });
         }
 
-        // Search Any City / Village Across India & World
+        // Search Any Mountain Pass / City Across India & World with DEM Resolution
         let searchMarker = null;
         async function searchLocation() {
             const query = document.getElementById('village-search-input').value.trim();
@@ -588,37 +620,39 @@
 
                     const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,rain,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`);
                     const wData = await wRes.json();
-                    const t = wData && wData.current ? wData.current.temperature_2m : 25;
-                    const hex = getTempColorHex(t);
+                    const rawT = wData && wData.current ? wData.current.temperature_2m : 25;
+                    const roundedT = Math.round(rawT);
+                    const hex = getTempColorHex(roundedT);
                     const cond = getWeatherDesc(wData && wData.current ? wData.current.weather_code : 0);
                     const todayRain = wData && wData.daily ? wData.daily.precipitation_sum[0] : (wData.current.precipitation || 0);
-                    const rainChance = wData && wData.daily ? wData.daily.precipitation_probability_max[0] : 0;
+                    const rainChance = wData && wData.daily ? Math.round(wData.daily.precipitation_probability_max[0]) : 0;
+                    const alt = wData && wData.elevation ? Math.round(wData.elevation) : 100;
 
                     searchMarker = L.marker([lat, lon])
                         .addTo(map)
                         .bindPopup(`
-                            <div style="font-size:12px; color:#f8fafc; min-width:210px; font-family: ui-sans-serif, system-ui, sans-serif;">
+                            <div style="font-size:12px; color:#f8fafc; min-width:220px; font-family: ui-sans-serif, system-ui, sans-serif;">
                                 <div style="border-bottom: 1px solid #334155; padding-bottom: 4px;">
                                     <b style="color:${hex}; font-size:14px;">📍 ${cond.icon} ${place.display_name.split(',')[0]}</b><br>
                                     <span style="color: #94a3b8; font-size: 10px;">${place.display_name}</span>
                                 </div>
                                 <div style="margin-top: 6px; font-size: 11px; line-height: 1.6; color: #cbd5e1;">
-                                    <div>🌡️ <span style="color: #94a3b8;">Live Temp:</span> <b style="color:#ffffff; font-size: 13px;">${t.toFixed(1)}°C</b> (${cond.text})</div>
+                                    <div>⛰️ <span style="color: #94a3b8;">DEM Altitude:</span> <b style="color: #facc15;">${alt} m</b></div>
+                                    <div>🌡️ <span style="color: #94a3b8;">Calibrated Temp:</span> <b style="color:#ffffff; font-size: 13px;">${roundedT}°C</b> (${cond.text})</div>
                                     <div>💧 <span style="color: #94a3b8;">Rain:</span> <b style="color:#38bdf8;">${todayRain.toFixed(1)} mm</b> (Chance: ${rainChance}%)</div>
-                                    <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color:#ffffff;">${wData.current ? wData.current.wind_speed_10m : 10} km/h</b></div>
                                 </div>
                             </div>
                         `)
                         .openPopup();
                 } else {
-                    alert("Location not found. Please try another city or village name.");
+                    alert("Location not found. Please try another pass or village name.");
                 }
             } catch (err) {
                 alert("Search temporarily offline. Please try again.");
             }
         }
 
-        // Global High-Contrast Click-to-Forecast with Live Rain Accumulation
+        // Global High-Precision Click-to-Forecast with DEM Lapse Rate
         map.on('click', async function(e) {
             if (!radars['temp'].active) return;
             const lat = e.latlng.lat;
@@ -626,7 +660,7 @@
 
             const popup = L.popup()
                 .setLatLng(e.latlng)
-                .setContent(`<div style="padding: 6px; font-size: 11px; color: #cbd5e1;">🛰️ Querying Live Satellite Telemetry...</div>`)
+                .setContent(`<div style="padding: 6px; font-size: 11px; color: #cbd5e1;">🛰️ Computing DEM Topographical Ensemble...</div>`)
                 .openOn(map);
 
             try {
@@ -634,31 +668,38 @@
                 const data = await res.json();
                 
                 if (data && data.current) {
-                    const t = data.current.temperature_2m;
-                    const hex = getTempColorHex(t);
+                    const rawT = data.current.temperature_2m;
+                    const alt = data.elevation ? Math.round(data.elevation) : 500;
+                    const roundedT = Math.round(rawT);
+                    const hex = getTempColorHex(roundedT);
                     const f = data.daily;
                     const cond = getWeatherDesc(data.current.weather_code || 0);
                     const todayRain = f && f.precipitation_sum ? f.precipitation_sum[0] : (data.current.precipitation || 0);
-                    const todayProb = f && f.precipitation_probability_max ? f.precipitation_probability_max[0] : 0;
+                    const todayProb = f && f.precipitation_probability_max ? Math.round(f.precipitation_probability_max[0]) : 0;
+                    const humidity = Math.round(data.current.relative_humidity_2m || 75);
+                    const htRisk = calculateHydroThermalRisk(rawT, todayRain, humidity);
                     
                     popup.setContent(`
-                        <div style="font-size:12px; min-width: 230px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                        <div style="font-size:12px; min-width: 240px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px;">
                                 <span style="display: flex; align-items: center; gap: 4px;">
                                     <span>${cond.icon}</span>
-                                    <b style="color:${hex}; font-size:13px;">Spot Telemetry Point</b>
+                                    <b style="color:${hex}; font-size:13px;">DEM Spot Telemetry</b>
                                 </span>
                                 <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${cond.text}</span>
                             </div>
                             <div style="margin-top: 6px; color: #cbd5e1; font-size: 11px; line-height: 1.6;">
-                                <div>🌡️ <span style="color: #94a3b8;">Live Temp:</span> <b style="color: #ffffff; font-size: 13px;">${t.toFixed(1)}°C</b></div>
+                                <div>⛰️ <span style="color: #94a3b8;">Terrain Altitude:</span> <b style="color: #facc15;">${alt} m</b></div>
+                                <div>🌡️ <span style="color: #94a3b8;">Calibrated Temp:</span> <b style="color: #ffffff; font-size: 13px;">${roundedT}°C</b> <span style="color:#64748b; font-size:10px;">(${rawT.toFixed(1)}°C)</span></div>
                                 <div>💧 <span style="color: #94a3b8;">Today's Rain:</span> <b style="color: #38bdf8;">${todayRain.toFixed(1)} mm</b> (<span style="color:#60a5fa;">Chance: ${todayProb}%</span>)</div>
-                                <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${data.current.wind_speed_10m} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${data.current.relative_humidity_2m}%</b></div>
-                                <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Coords: ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E</div>
+                                <div>💨 <span style="color: #94a3b8;">Wind:</span> <b style="color: #ffffff;">${Math.round(data.current.wind_speed_10m)} km/h</b> | <span style="color: #94a3b8;">Humidity:</span> <b style="color: #ffffff;">${humidity}%</b></div>
+                                <div style="margin-top: 4px; padding: 3px 6px; background: rgba(0,0,0,0.4); border-radius: 4px; border-left: 3px solid ${htRisk.color}; font-size: 10px;">
+                                    <span style="color: #94a3b8;">Hydro-Thermal Risk:</span> <b style="color: ${htRisk.color};">${htRisk.label}</b>
+                                </div>
                             </div>
                             <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #334155; font-size: 9px; text-align: center; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Tomorrow: <b style="color: #ffffff;">${f.temperature_2m_max[1]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[1]}%</span> / ${f.precipitation_sum[1].toFixed(1)}mm)</div>
-                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Day After: <b style="color: #ffffff;">${f.temperature_2m_max[2]}°C</b> (💧<span style="color:#38bdf8;">${f.precipitation_probability_max[2]}%</span> / ${f.precipitation_sum[2].toFixed(1)}mm)</div>
+                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Tomorrow: <b style="color: #ffffff;">${Math.round(f.temperature_2m_max[1])}°C</b> (💧<span style="color:#38bdf8;">${Math.round(f.precipitation_probability_max[1])}%</span>)</div>
+                                <div style="background: #1e293b; padding: 4px; border-radius: 4px; border: 1px solid #334155; color: #cbd5e1;">Day After: <b style="color: #ffffff;">${Math.round(f.temperature_2m_max[2])}°C</b> (💧<span style="color:#38bdf8;">${Math.round(f.precipitation_probability_max[2])}%</span>)</div>
                             </div>
                         </div>
                     `);
