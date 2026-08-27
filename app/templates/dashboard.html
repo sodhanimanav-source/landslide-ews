@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #0f172a; }
+        #map { height: calc(100vh - 65px); width: 100%; border-radius: 0; z-index: 1; background: #e5e7eb; }
         .sidebar-bg {
             background: radial-gradient(circle at 50% 50%, #165b82 0%, #0e3d59 100%);
         }
@@ -103,21 +103,23 @@
         .leaflet-popup-close-button:hover {
             color: #ffffff !important;
         }
-        /* Topo Layer Switcher Toolbar Styling */
         .leaflet-control-layers {
-            background: rgba(15, 23, 42, 0.92) !important;
+            background: rgba(15, 23, 42, 0.95) !important;
             color: #ffffff !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
             border-radius: 8px !important;
+            padding: 8px !important;
             backdrop-filter: blur(10px) !important;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.6) !important;
         }
         .leaflet-control-layers-base label {
             color: #f8fafc !important;
             font-size: 11px !important;
             font-weight: 700 !important;
             cursor: pointer;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
     </style>
 </head>
@@ -165,8 +167,8 @@
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
                     <span class="text-base">⛰️</span>
                     <div>
-                        <span id="t-topo-label" class="font-medium text-xs block">3D Shaded Relief Mountain Map</span>
-                        <span class="text-[9px] text-emerald-300">USGS / ESRI Mountain Ridges</span>
+                        <span id="t-topo-label" class="font-medium text-xs block">Topographic Relief Map</span>
+                        <span class="text-[9px] text-emerald-300">Himalayan Contours & Slopes Active</span>
                     </div>
                 </div>
 
@@ -177,7 +179,7 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Buttons -->
+                <!-- Radar Switcher Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
@@ -251,7 +253,7 @@
                 <button onclick="searchLocation()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">Search</button>
             </div>
 
-            <!-- Calibration Legend -->
+            <!-- SatFish Style Legend -->
             <div id="satfish-legend">
                 <div class="flex items-center justify-between text-[10px] text-white font-bold mb-1">
                     <span>-5°C (Cryo)</span>
@@ -273,7 +275,7 @@
                 subtitle: "Integrated Hydro-Geological Intelligence Platform",
                 reportBtn: "+ Report Incident",
                 myLocations: "All NER States & India",
-                topoLabel: "3D Shaded Relief Mountain Map",
+                topoLabel: "Topographic Relief Map",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
                 catchmentRadar: "CatchmentRadar (Buffer)",
@@ -289,11 +291,11 @@
                 subtitle: "एकीकृत भूवैज्ञानिक और हाइड्रो-खुफिया मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
                 myLocations: "समस्त भारत एवं पूर्वोत्तर",
-                topoLabel: "3D पर्वत रिलीफ मानचित्र",
+                topoLabel: "पर्वत स्थलाकृतिक मानचित्र",
                 pushAlerts: "सूचनाएं (Push Notifications)",
                 landslideRadar: "भूस्खलन रडार",
                 catchmentRadar: "कैचमेंट रडार (बफरिंग)",
-                rainRadar: "वर्षा रडar",
+                rainRadar: "वर्षा रडार",
                 weatherRadar: "मौसम रडार",
                 tempRadar: "उच्च-सटीक तापमान रडार",
                 windRadar: "पवन रडार",
@@ -305,7 +307,7 @@
                 subtitle: "সমন্বিত হাইড্ৰ'-ভূতাত্ত্বিক চোৰাংচোৱা মঞ্চ",
                 reportBtn: "+ ঘটনা ৰিপৰ্ট কৰক",
                 myLocations: "সকলো ৰাজ্য আৰু ভাৰত",
-                topoLabel: "পৰ্বত ৰিলিফ মানচিত্ৰ",
+                topoLabel: "পৰ্বত স্থলাকৃতি মানচিত্ৰ",
                 pushAlerts: "জাননী (Push Notifications)",
                 landslideRadar: "ভূমিস্খলন ৰাডাৰ",
                 catchmentRadar: "কেচমেণ্ট বাফাৰ ৰাডাৰ",
@@ -321,7 +323,7 @@
                 subtitle: "সমন্বিত ভূতাত্ত্বিক ও ডপলার পর্যবেক্ষণ প্ল্যাটফর্ম",
                 reportBtn: "+ ঘটনা রিপোর্ট করুন",
                 myLocations: "উত্তর-পূর্ব ও সমগ্র ভারত",
-                topoLabel: "পাহাড় রিলিফ মানচিত্র",
+                topoLabel: "পর্বত ভূসংস্থান মানচিত্র",
                 pushAlerts: "বিজ্ঞপ্তি (Push Notifications)",
                 landslideRadar: "ভূমিধস রাডার",
                 catchmentRadar: "ক্যাচমেন্ট বাফার রাডার",
@@ -337,7 +339,7 @@
                 subtitle: "एकीकृत भू-वैज्ञानिक गुप्तचर मञ्च",
                 reportBtn: "+ घटना रिपोर्ट गर्नुहोस्",
                 myLocations: "सबै राज्यहरू तथा भारत",
-                topoLabel: "पहाड रिलीफ नक्सा",
+                topoLabel: "पहाड भू-धरातल नक्सा",
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
                 catchmentRadar: "क्याचमेन्ट बफर राडार",
@@ -369,12 +371,12 @@
         }
 
         // Initialize Map
-        const map = L.map('map', { maxZoom: 19, minZoom: 3 }).setView([26.15, 93.00], 7);
+        const map = L.map('map', { maxZoom: 17, minZoom: 4 }).setView([26.15, 93.00], 7);
 
-        // 1. Shaded Relief Topography (Primary Default Map with Mountain Shading)
-        const topoReliefLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 18,
-            attribution: 'Tiles &copy; Esri Topo'
+        // 1. Primary Shaded Topographic Relief Engine (OpenTopoMap - Direct Mountain Ridges & Shading)
+        const openTopoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap'
         }).addTo(map);
 
         // 2. High-Res Satellite Imagery
@@ -383,25 +385,19 @@
             attribution: 'Tiles &copy; Esri Imagery'
         });
 
-        // 3. Dark Tactical Canvas
+        // 3. Dark Tactical Operations Canvas
         const darkCanvasLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 16,
             attribution: 'Tiles &copy; Esri Dark'
         });
 
-        // Topographic Reference Labels
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 18,
-            zIndex: 400
-        }).addTo(map);
-
-        // Base Map Switcher Control
+        // Layer Switcher Toolbar
         const baseMaps = {
-            "🏔️ 3D Topo Relief (Pahad)": topoReliefLayer,
+            "⛰️ Topo Relief (OpenTopo)": openTopoLayer,
             "🛰️ Satellite Terrain": satelliteLayer,
             "🗺️ Dark Canvas": darkCanvasLayer
         };
-        L.control.layers(baseMaps, null, { position: 'bottomright' }).addTo(map);
+        L.control.layers(baseMaps, null, { position: 'bottomright', collapsed: false }).addTo(map);
 
         // 1. Full Pan-NER Landslide Layer
         const landslideLayer = L.layerGroup().addTo(map);
@@ -440,7 +436,7 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. Catchment Buffers (Default Off taaki map clean rahe)
+        // 2. Catchment Buffers (Default Inactive taaki topo texture saaf dikhe)
         const catchmentLayer = L.layerGroup();
 
         const catchmentBasins = [
@@ -532,7 +528,7 @@
             `);
         });
 
-        // 3. Rain Radar
+        // 3. Rain Radar (Set to moderate opacity taaki mountain topography transparent dikhe)
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -540,7 +536,7 @@
                 if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
                     const lastFrame = data.radar.past[data.radar.past.length - 1];
                     L.tileLayer(`https://tilecache.rainviewer.com${lastFrame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.65, zIndex: 100, maxNativeZoom: 5, maxZoom: 18, tileSize: 256
+                        opacity: 0.45, zIndex: 100, maxNativeZoom: 5, maxZoom: 18, tileSize: 256
                     }).addTo(rainRadarLayer);
                 }
             }).catch(() => {});
@@ -559,13 +555,13 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 5. PRECISE GIS-CALIBRATED DEM MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
+        // 5. DEM Multi-Model Ensemble Temperature Radar
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
         L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=9aaeda92fc699324d14797b8638810b5', {
             maxZoom: 18,
-            opacity: 0.75,
+            opacity: 0.70,
             zIndex: 350
         }).addTo(tempRadarLayer);
 
@@ -739,7 +735,7 @@
             });
         }
 
-        // Search Any Mountain Pass / City Across India & World with DEM Resolution
+        // Search Any Location
         let searchMarker = null;
         async function searchLocation() {
             const query = document.getElementById('village-search-input').value.trim();
@@ -792,7 +788,7 @@
             }
         }
 
-        // Global High-Precision Click-to-Forecast with DEM Lapse Rate
+        // Global High-Precision Click-to-Forecast
         map.on('click', async function(e) {
             if (!radars['temp'].active) return;
             const lat = e.latlng.lat;
@@ -896,7 +892,7 @@
                 .bindPopup(`<b>⚡ Severe Lightning Strike</b><br>Location: ${st.name}`);
         });
 
-        // Toggle Switcher (Catchment Radar ko default inactive rakha hai taaki pahad clear dikhe)
+        // Toggle Switcher (Default: LandslideRadar ON, RainRadar ON, Topo Basemap Active)
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
             'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: false },
