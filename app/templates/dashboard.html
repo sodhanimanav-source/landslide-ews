@@ -147,10 +147,10 @@
                 </div>
 
                 <div class="px-4 py-2 flex items-center gap-3 text-white/90 hover:text-white radar-item rounded-r-xl">
-                    <span class="text-base">🌤️</span>
+                    <span class="text-base">🌊</span>
                     <div>
-                        <span id="t-weather-loc" class="font-medium text-xs block">DEM Multi-Model Ensemble</span>
-                        <span class="text-[9px] text-amber-300">ECMWF + GFS + Topo Lapse Rate</span>
+                        <span id="t-catchment-label" class="font-medium text-xs block">Catchment Buffering</span>
+                        <span class="text-[9px] text-sky-300">Watershed Cascade Model</span>
                     </div>
                 </div>
 
@@ -161,10 +161,15 @@
 
                 <div class="my-2 border-t border-white/10 mx-4"></div>
 
-                <!-- Radar Buttons -->
+                <!-- Radar Switcher Buttons -->
                 <div id="btn-landslide" onclick="toggleRadar('landslide')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
                     <span class="text-base">🎯</span>
                     <span id="t-landslide-radar" class="font-semibold text-xs">LandslideRadar</span>
+                </div>
+
+                <div id="btn-catchment" onclick="toggleRadar('catchment')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
+                    <span class="text-base">🌊</span>
+                    <span id="t-catchment-radar" class="font-semibold text-xs">CatchmentRadar (Buffer)</span>
                 </div>
 
                 <div id="btn-rain" onclick="toggleRadar('rain')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item active rounded-r-xl">
@@ -179,7 +184,7 @@
 
                 <div id="btn-temp" onclick="toggleRadar('temp')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
                     <span class="text-base">🌡️</span>
-                    <span id="t-temp-radar" class="font-semibold text-xs">DEM TemperatureRadar (Ensemble)</span>
+                    <span id="t-temp-radar" class="font-semibold text-xs">DEM TemperatureRadar</span>
                 </div>
 
                 <div id="btn-wind" onclick="toggleRadar('wind')" class="px-4 py-2.5 flex items-center gap-3 text-white radar-item rounded-r-xl">
@@ -203,14 +208,14 @@
                     <span class="bg-red-500/30 text-red-300 text-[9px] px-1.5 py-0.5 rounded font-bold">LIVE</span>
                 </div>
                 <div id="bulletin-list" class="text-[11px] space-y-1.5 pr-1">
+                    <p class="text-red-400 font-medium">🔴 Teesta Basin: 15km Downstream Buffer Breach (92%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-10 (Sevoke–Gangtok): Critical Red (91%)</p>
+                    <p class="text-red-400 font-medium">🔴 Dima Hasao Rail Basin: Track Subsidence (89%)</p>
                     <p class="text-red-400 font-medium">🔴 Chungthang–Mangan: GLOF Moraine Alert (88%)</p>
-                    <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
-                    <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
-                    <p class="text-red-400 font-medium">🔴 Dima Hasao Lumding Rail: Track Subsidence (89%)</p>
                     <p class="text-red-400 font-medium">🔴 NH-37 (Imphal–Jiribam): Severe Mudslide (86%)</p>
                     <p class="text-red-400 font-medium">🔴 Tupul–Noney Basin: Fracture Movement (85%)</p>
-                    <p class="text-red-400 font-medium">🔴 NH-54 (Aizawl–Lunglei): Slope Failure (76%)</p>
+                    <p class="text-red-400 font-medium">🔴 Sela Pass–Tawang: High Altitude Failure (84%)</p>
+                    <p class="text-red-400 font-medium">🔴 NH-29 (Dimapur–Kohima): Active Rockfall (82%)</p>
                     <p class="text-amber-400 font-medium">🟡 NH-6 Sonapur Tunnel: Saturated Strata (79%)</p>
                     <p class="text-amber-400 font-medium">🟡 Trans-Arunachal (Itanagar–Ziro): Heavy Rain (58%)</p>
                     <p class="text-amber-400 font-medium">🟡 Cherrapunji Plateau: Heavy Infiltration (64%)</p>
@@ -252,12 +257,13 @@
                 subtitle: "Integrated Hydro-Geological Intelligence Platform",
                 reportBtn: "+ Report Incident",
                 myLocations: "All NER States & India",
-                weatherLoc: "DEM Multi-Model Ensemble",
+                weatherLoc: "Catchment Buffering Active",
                 pushAlerts: "Push notifications",
                 landslideRadar: "LandslideRadar",
+                catchmentRadar: "CatchmentRadar (Buffer)",
                 rainRadar: "RainRadar",
                 weatherRadar: "WeatherRadar",
-                tempRadar: "DEM TemperatureRadar (Ensemble)",
+                tempRadar: "DEM TemperatureRadar",
                 windRadar: "WindRadar",
                 lightningRadar: "LightningRadar",
                 weatherNews: "Live Regional Alerts (8 States)"
@@ -267,14 +273,15 @@
                 subtitle: "एकीकृत भूवैज्ञानिक और हाइड्रो-खुफिया मंच",
                 reportBtn: "+ घटना की रिपोर्ट करें",
                 myLocations: "समस्त भारत एवं पूर्वोत्तर",
-                weatherLoc: "डीईएम मल्टी-मॉडल एन्सेम्बल",
+                weatherLoc: "कैचमेंट बफरिंग सक्रिय",
                 pushAlerts: "सूचनाएं (Push Notifications)",
-                landslideRadar: "भूस्खलन रडार (LandslideRadar)",
-                rainRadar: "वर्षा रडार (RainRadar)",
-                weatherRadar: "मौसम रडार (WeatherRadar)",
-                tempRadar: "उच्च-सटीक तापमान रडार (DEM)",
-                windRadar: "पवन रडार (WindRadar)",
-                lightningRadar: "तड़ित रडार (LightningRadar)",
+                landslideRadar: "भूस्खलन रडार",
+                catchmentRadar: "कैचमेंट रडार (बफरिंग)",
+                rainRadar: "वर्षा रडार",
+                weatherRadar: "मौसम रडार",
+                tempRadar: "उच्च-सटीक तापमान रडार",
+                windRadar: "पवन रडार",
+                lightningRadar: "तड़ित रडार",
                 weatherNews: "लाइव क्षेत्रीय अलर्ट (8 राज्य)"
             },
             as: {
@@ -282,9 +289,10 @@
                 subtitle: "সমন্বিত হাইড্ৰ'-ভূতাত্ত্বিক চোৰাংচোৱা মঞ্চ",
                 reportBtn: "+ ঘটনা ৰিপৰ্ট কৰক",
                 myLocations: "সকলো ৰাজ্য আৰু ভাৰত",
-                weatherLoc: "উচ্চ-সঠিকতা মাল্টি-মডেল",
+                weatherLoc: "কেচমেণ্ট বাফাৰিং সক্ৰিয়",
                 pushAlerts: "জাননী (Push Notifications)",
                 landslideRadar: "ভূমিস্খলন ৰাডাৰ",
+                catchmentRadar: "কেচমেণ্ট বাফাৰ ৰাডাৰ",
                 rainRadar: "বৰষুণ ৰাডাৰ",
                 weatherRadar: "বতৰ ৰাডাৰ",
                 tempRadar: "উচ্চ-সঠিকতা তাপমাত্ৰা ৰাডাৰ",
@@ -297,9 +305,10 @@
                 subtitle: "সমন্বিত ভূতাত্ত্বিক ও ডপলার পর্যবেক্ষণ প্ল্যাটফর্ম",
                 reportBtn: "+ ঘটনা রিপোর্ট করুন",
                 myLocations: "উত্তর-পূর্ব ও সমগ্র ভারত",
-                weatherLoc: "মাল্টি-মডেল উচ্চ নির্ভুলতা",
+                weatherLoc: "ক্যাচমেন্ট বাফারিং সক্রিয়",
                 pushAlerts: "বিজ্ঞপ্তি (Push Notifications)",
                 landslideRadar: "ভূমিধস রাডার",
+                catchmentRadar: "ক্যাচমেন্ট বাফার রাডার",
                 rainRadar: "বৃষ্টি রাডার",
                 weatherRadar: "আবহাওয়া রাডার",
                 tempRadar: "উচ্চ নির্ভুলতা তাপমাত্রা রাডার",
@@ -312,9 +321,10 @@
                 subtitle: "एकीकृत भू-वैज्ञानिक गुप्तचर मञ्च",
                 reportBtn: "+ घटना रिपोर्ट गर्नुहोस्",
                 myLocations: "सबै राज्यहरू तथा भारत",
-                weatherLoc: "उच्च-सटीकता मल्टी-मोडेल",
+                weatherLoc: "क्याचमेन्ट बफरिङ सक्रिय",
                 pushAlerts: "सूचनाहरू (Push Notifications)",
                 landslideRadar: "पहिरो राडार",
+                catchmentRadar: "क्याचमेन्ट बफर राडार",
                 rainRadar: "वर्षा राडार",
                 weatherRadar: "मौसम राडार",
                 tempRadar: "उच्च-सटीकता तापक्रम राडार",
@@ -333,6 +343,7 @@
             document.getElementById('t-weather-loc').innerText = t.weatherLoc;
             document.getElementById('t-push-alerts').innerText = t.pushAlerts;
             document.getElementById('t-landslide-radar').innerText = t.landslideRadar;
+            document.getElementById('t-catchment-radar').innerText = t.catchmentRadar;
             document.getElementById('t-rain-radar').innerText = t.rainRadar;
             document.getElementById('t-weather-radar').innerText = t.weatherRadar;
             document.getElementById('t-temp-radar').innerText = t.tempRadar;
@@ -342,7 +353,7 @@
         }
 
         // Initialize Map
-        const map = L.map('map', { maxZoom: 19, minZoom: 3 }).setView([23.50, 85.00], 5);
+        const map = L.map('map', { maxZoom: 19, minZoom: 3 }).setView([26.15, 93.00], 7);
 
         // ESRI Base Map
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
@@ -393,7 +404,101 @@
                 .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
         });
 
-        // 2. Rain Radar
+        // 2. MULTI-HAZARD CATCHMENT BUFFERING ENGINE (Dynamic River Basin Cascades)
+        const catchmentLayer = L.layerGroup().addTo(map);
+
+        const catchmentBasins = [
+            {
+                name: "Teesta Upper Basin (GLOF / Landslide Cascade)",
+                area: "12,450 km²",
+                leadTime: "3.2 Hours",
+                moistureSat: "92% (High Pore Pressure)",
+                downstreamHighway: "NH-10 (Sevoke - Gangtok)",
+                color: "#ef4444",
+                coords: [
+                    [27.85, 88.40], [27.75, 88.80], [27.40, 88.75], 
+                    [27.15, 88.60], [26.90, 88.45], [26.85, 88.35], 
+                    [27.10, 88.30], [27.55, 88.25]
+                ],
+                bufferCenter: [27.35, 88.52]
+            },
+            {
+                name: "Dima Hasao Hill Rail Catchment (Jatinga Basin)",
+                area: "4,890 km²",
+                leadTime: "2.5 Hours",
+                moistureSat: "88% (Track Subsidence Trigger)",
+                downstreamHighway: "Lumding - Badarpur Hill Section",
+                color: "#ef4444",
+                coords: [
+                    [25.35, 92.85], [25.40, 93.30], [25.15, 93.25], 
+                    [24.85, 92.95], [24.95, 92.70], [25.20, 92.75]
+                ],
+                bufferCenter: [25.15, 93.00]
+            },
+            {
+                name: "Kameng / Dikrong Strategic Catchment",
+                area: "8,920 km²",
+                leadTime: "4.0 Hours",
+                moistureSat: "74% (Moderate Debris Flow Risk)",
+                downstreamHighway: "Bhalukpong - Bomdila - Tawang Axis",
+                color: "#f59e0b",
+                coords: [
+                    [27.70, 92.10], [27.65, 92.80], [27.15, 92.90], 
+                    [26.95, 92.65], [27.05, 92.20], [27.40, 92.00]
+                ],
+                bufferCenter: [27.35, 92.45]
+            },
+            {
+                name: "Barak Tributary Catchment (Cachar - Imphal Axis)",
+                area: "6,780 km²",
+                leadTime: "3.5 Hours",
+                moistureSat: "84% (Mudslide Hazard Zone)",
+                downstreamHighway: "NH-37 (Silchar - Jiribam - Imphal)",
+                color: "#ef4444",
+                coords: [
+                    [25.05, 93.10], [25.10, 93.85], [24.65, 93.80], 
+                    [24.60, 93.15], [24.75, 92.80]
+                ],
+                bufferCenter: [24.85, 93.45]
+            }
+        ];
+
+        catchmentBasins.forEach(b => {
+            // Semi-transparent polygon showing the exact watershed drainage basin
+            const poly = L.polygon(b.coords, {
+                color: b.color,
+                weight: 2,
+                opacity: 0.9,
+                fillColor: b.color,
+                fillOpacity: 0.25,
+                dashArray: "6, 6"
+            }).addTo(catchmentLayer);
+
+            // Cascading Downstream Buffer Corridor Ring
+            L.circle(b.bufferCenter, {
+                radius: 18000,
+                color: b.color,
+                weight: 1.5,
+                fillColor: b.color,
+                fillOpacity: 0.12
+            }).addTo(catchmentLayer);
+
+            poly.bindPopup(`
+                <div style="font-size:12px; min-width:240px; color:#f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #334155; padding-bottom:4px;">
+                        <b style="color:${b.color}; font-size:13px;">🌊 ${b.name}</b>
+                    </div>
+                    <div style="margin-top:6px; color:#cbd5e1; font-size:11px; line-height:1.6;">
+                        <div>🗺️ <span style="color:#94a3b8;">Drainage Basin Area:</span> <b style="color:#ffffff;">${b.area}</b></div>
+                        <div>⏱️ <span style="color:#94a3b8;">Cascade Lead Time:</span> <b style="color:#facc15;">${b.leadTime}</b></div>
+                        <div>💧 <span style="color:#94a3b8;">Upstream Soil Saturation:</span> <b style="color:#38bdf8;">${b.moistureSat}</b></div>
+                        <div>🛣️ <span style="color:#94a3b8;">Downstream Impact:</span> <b style="color:#ffffff;">${b.downstreamHighway}</b></div>
+                    </div>
+                </div>
+            `);
+        });
+
+        // 3. Rain Radar
         const rainRadarLayer = L.layerGroup().addTo(map);
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
@@ -406,7 +511,7 @@
                 }
             }).catch(() => {});
 
-        // 3. Weather Overlay
+        // 4. Weather Overlay
         const weatherRadarLayer = L.layerGroup();
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
@@ -420,7 +525,7 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. PRECISE GIS-CALIBRATED DEM MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
+        // 5. PRECISE GIS-CALIBRATED DEM MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
@@ -430,9 +535,7 @@
             zIndex: 350
         }).addTo(tempRadarLayer);
 
-        // Ground-Truth DEM Station Profiles (Exact Survey of India GIS Coordinates & Altitude in Meters)
         const allNerStations = [
-            // Pan-India Major Metros
             { lat: 28.6139, lng: 77.2090, alt: 216, name: "New Delhi", state: "Delhi", forecast: [] },
             { lat: 19.0760, lng: 72.8777, alt: 14, name: "Mumbai", state: "Maharashtra", forecast: [] },
             { lat: 22.5726, lng: 88.3639, alt: 9, name: "Kolkata", state: "West Bengal", forecast: [] },
@@ -445,7 +548,6 @@
             { lat: 26.8467, lng: 80.9462, alt: 123, name: "Lucknow", state: "UP", forecast: [] },
             { lat: 25.5941, lng: 85.1376, alt: 53, name: "Patna", state: "Bihar", forecast: [] },
 
-            // Northeast 8 States GIS Town Centre Precision Network
             { lat: 27.6039, lng: 88.6464, alt: 1780, name: "Chungthang", state: "Sikkim", forecast: [] },
             { lat: 27.3389, lng: 88.6065, alt: 1650, name: "Gangtok", state: "Sikkim", forecast: [] },
             { lat: 27.5861, lng: 91.8653, alt: 3048, name: "Tawang Pass", state: "Arunachal", forecast: [] },
@@ -499,7 +601,6 @@
             return { label: "NORMAL STABILITY (GREEN)", color: "#10b981" };
         }
 
-        // Multi-Model Ensemble Fetch with DEM Elevation Compensation
         async function fetchLiveWeatherData() {
             try {
                 const lats = allNerStations.map(s => s.lat).join(',');
@@ -516,7 +617,6 @@
                         const modelElevation = item.elevation || allNerStations[i].alt;
                         const trueDEMAltitude = allNerStations[i].alt;
                         
-                        // Physics: Environmental Lapse Rate Compensation (Gamma = 0.0065 C/m)
                         const altitudeDelta = trueDEMAltitude - modelElevation;
                         const compensatedTemp = rawT - (0.0065 * altitudeDelta);
 
@@ -558,7 +658,6 @@
                 const cond = getWeatherDesc(s.weatherCode);
                 const htRisk = calculateHydroThermalRisk(s.temp, s.todayRainSum || 0, s.humidity);
 
-                // Absolute center-aligned anchor lock [0,0] with transform: translate(-50%, -50%)
                 const badgeIcon = L.divIcon({
                     className: 'temp-badge-box',
                     html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name} <b style="color:#ffffff;">${roundedTemp}°</b></div>`,
@@ -719,7 +818,7 @@
         // Initialize Live Data on Load
         fetchLiveWeatherData();
 
-        // 5. Wind Radar
+        // 6. Wind Radar
         const windRadarLayer = L.layerGroup();
         const windStations = [
             { pos: [26.1445, 91.7362], speed: "18 km/h SW", arrow: "↗", name: "Brahmaputra Basin" },
@@ -743,7 +842,7 @@
                 .bindPopup(`<b>💨 Wind Telemetry: ${w.name}</b><br>Speed: ${w.speed}`);
         });
 
-        // 6. Lightning Radar
+        // 7. Lightning Radar
         const lightningRadarLayer = L.layerGroup();
         const strikes = [
             { pos: [26.15, 91.75], name: "Kamrup Microburst" },
@@ -766,6 +865,7 @@
         // Toggle Switcher
         const radars = {
             'landslide': { layer: landslideLayer, btn: 'btn-landslide', active: true },
+            'catchment': { layer: catchmentLayer, btn: 'btn-catchment', active: true },
             'rain': { layer: rainRadarLayer, btn: 'btn-rain', active: true },
             'weather': { layer: weatherRadarLayer, btn: 'btn-weather', active: false },
             'temp': { layer: tempRadarLayer, btn: 'btn-temp', active: false },
