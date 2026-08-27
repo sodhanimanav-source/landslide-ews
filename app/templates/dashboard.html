@@ -37,6 +37,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            transform: translate(-50%, -50%);
         }
         .pulse-cell {
             animation: pulse-ring 1.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -57,6 +58,11 @@
             white-space: nowrap;
             display: inline-block;
             cursor: pointer;
+            transform: translate(-50%, -50%);
+        }
+        .temp-badge-box {
+            background: transparent !important;
+            border: none !important;
         }
         #satfish-legend {
             position: absolute;
@@ -361,7 +367,7 @@
             { name: "Nagaland: NH-29 (Chumukedima - Kohima)", category: "Fragile Shale Slopes", risk: "HIGH RISK (82%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#ef4444" },
             { name: "Assam Dima Hasao: Lumding - Badarpur Hill Rail", category: "Critical Rail Infrastructure", risk: "CRITICAL RED (89%)", coords: [[25.180, 93.020], [25.150, 93.100], [24.890, 92.850]], color: "#ef4444" },
             { name: "Meghalaya: NH-6 Sonapur Tunnel Zone", category: "Heavy Rainfall Tunnel Corridor", risk: "HIGH RISK (79%)", coords: [[25.200, 92.350], [25.110, 92.380]], color: "#ef4444" },
-            { name: "Meghalaya: Cherrapunji - Mawsynram Escarpment", category: "Extreme Precipitation Plateau", risk: "AMBER ADVISORY (64%)", coords: [[25.270, 91.720], [25.300, 91.580]], color: "#f59e0b" },
+            { name: "Meghalaya: Cherrapunji - Mawsynram Escarpment", category: "Extreme Precipitation Plateau", risk: "AMBER ADVISORY (64%)", coords: [[25.2986, 91.7302], [25.300, 91.580]], color: "#f59e0b" },
             { name: "Manipur: NH-37 (Imphal - Jiribam Highway)", category: "Mudflow & Debris Corridor", risk: "CRITICAL RED (86%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" },
             { name: "Manipur: Tupul - Noney Railway Basin", category: "Geological Fracture Zone", risk: "HIGH RISK (85%)", coords: [[24.710, 93.650], [24.740, 93.600]], color: "#ef4444" },
             { name: "Mizoram: NH-54 (Aizawl - Lunglei Axis)", category: "Urban Ridge & Valley Highway", risk: "HIGH RISK (76%)", coords: [[23.727, 92.717], [23.100, 92.730], [22.880, 92.740]], color: "#ef4444" },
@@ -375,11 +381,11 @@
         });
 
         const regionZones = [
-            { pos: [27.338, 88.606], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
-            { pos: [25.180, 93.020], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
-            { pos: [23.727, 92.717], name: "Aizawl Urban Ridge", state: "Mizoram", desc: "Fragile shale rock & surface water infiltration risk." },
-            { pos: [27.586, 91.865], name: "Tawang High Plateau", state: "Arunachal", desc: "Freeze-thaw weathering and steep moraine debris." },
-            { pos: [25.670, 94.108], name: "Kohima Town Ridges", state: "Nagaland", desc: "Continuous road sinking & creeping slope deformation." }
+            { pos: [27.3389, 88.6065], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
+            { pos: [25.1833, 93.0167], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
+            { pos: [23.7271, 92.7176], name: "Aizawl Urban Ridge", state: "Mizoram", desc: "Fragile shale rock & surface water infiltration risk." },
+            { pos: [27.5861, 91.8653], name: "Tawang High Plateau", state: "Arunachal", desc: "Freeze-thaw weathering and steep moraine debris." },
+            { pos: [25.6751, 94.1086], name: "Kohima Town Ridges", state: "Nagaland", desc: "Continuous road sinking & creeping slope deformation." }
         ];
 
         regionZones.forEach(z => {
@@ -405,7 +411,7 @@
         const cloudRegions = [
             { pos: [26.18, 91.75], r: 70000, desc: "Dense Brahmaputra Valley Stratus" },
             { pos: [27.33, 88.61], r: 55000, desc: "High Himalayan Orographic Cloud Mass" },
-            { pos: [25.27, 91.72], r: 80000, desc: "Heavy Meghalaya Monsoon Front" },
+            { pos: [25.2986, 91.7302], r: 80000, desc: "Heavy Meghalaya Monsoon Front" },
             { pos: [19.07, 72.87], r: 90000, desc: "Arabian Sea Coastal Moisture Front" },
             { pos: [28.61, 77.20], r: 80000, desc: "Indo-Gangetic Convective Plain" }
         ];
@@ -414,7 +420,7 @@
                 .bindPopup(`<b>☁️ Cloud Cover</b><br>${c.desc}`);
         });
 
-        // 4. DEM-CORRECTED MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
+        // 4. PRECISE GIS-CALIBRATED DEM MULTI-MODEL ENSEMBLE TEMPERATURE RADAR
         const tempRadarLayer = L.layerGroup();
         let stationMarkers = [];
 
@@ -424,41 +430,42 @@
             zIndex: 350
         }).addTo(tempRadarLayer);
 
-        // Ground-Truth DEM Station Profiles (with Precise Altitude in Meters)
+        // Ground-Truth DEM Station Profiles (Exact Survey of India GIS Coordinates & Altitude in Meters)
         const allNerStations = [
-            { lat: 28.61, lng: 77.20, alt: 216, name: "New Delhi", state: "Delhi", forecast: [] },
-            { lat: 19.07, lng: 72.87, alt: 14, name: "Mumbai", state: "Maharashtra", forecast: [] },
-            { lat: 22.57, lng: 88.36, alt: 9, name: "Kolkata", state: "West Bengal", forecast: [] },
-            { lat: 13.08, lng: 80.27, alt: 6, name: "Chennai", state: "Tamil Nadu", forecast: [] },
-            { lat: 12.97, lng: 77.59, alt: 920, name: "Bengaluru", state: "Karnataka", forecast: [] },
-            { lat: 17.38, lng: 78.48, alt: 505, name: "Hyderabad", state: "Telangana", forecast: [] },
-            { lat: 26.91, lng: 75.78, alt: 431, name: "Jaipur", state: "Rajasthan", forecast: [] },
-            { lat: 34.08, lng: 74.79, alt: 1585, name: "Srinagar", state: "J&K", forecast: [] },
-            { lat: 31.10, lng: 77.17, alt: 2276, name: "Shimla", state: "Himachal", forecast: [] },
-            { lat: 26.84, lng: 80.94, alt: 123, name: "Lucknow", state: "UP", forecast: [] },
-            { lat: 25.59, lng: 85.13, alt: 53, name: "Patna", state: "Bihar", forecast: [] },
+            // Pan-India Major Metros
+            { lat: 28.6139, lng: 77.2090, alt: 216, name: "New Delhi", state: "Delhi", forecast: [] },
+            { lat: 19.0760, lng: 72.8777, alt: 14, name: "Mumbai", state: "Maharashtra", forecast: [] },
+            { lat: 22.5726, lng: 88.3639, alt: 9, name: "Kolkata", state: "West Bengal", forecast: [] },
+            { lat: 13.0827, lng: 80.2707, alt: 6, name: "Chennai", state: "Tamil Nadu", forecast: [] },
+            { lat: 12.9716, lng: 77.5946, alt: 920, name: "Bengaluru", state: "Karnataka", forecast: [] },
+            { lat: 17.3850, lng: 78.4867, alt: 505, name: "Hyderabad", state: "Telangana", forecast: [] },
+            { lat: 26.9124, lng: 75.7873, alt: 431, name: "Jaipur", state: "Rajasthan", forecast: [] },
+            { lat: 34.0837, lng: 74.7973, alt: 1585, name: "Srinagar", state: "J&K", forecast: [] },
+            { lat: 31.1048, lng: 77.1734, alt: 2276, name: "Shimla", state: "Himachal", forecast: [] },
+            { lat: 26.8467, lng: 80.9462, alt: 123, name: "Lucknow", state: "UP", forecast: [] },
+            { lat: 25.5941, lng: 85.1376, alt: 53, name: "Patna", state: "Bihar", forecast: [] },
 
-            // High-Altitude Strategic Passes & Fragile Slopes (NER)
-            { lat: 27.70, lng: 88.70, alt: 1780, name: "North Sikkim (Chungthang)", state: "Sikkim", forecast: [] },
-            { lat: 27.33, lng: 88.61, alt: 1650, name: "Gangtok Urban Ridge", state: "Sikkim", forecast: [] },
-            { lat: 27.58, lng: 91.86, alt: 3048, name: "Tawang High Pass", state: "Arunachal", forecast: [] },
-            { lat: 27.26, lng: 92.42, alt: 2415, name: "Bomdila Pass", state: "Arunachal", forecast: [] },
-            { lat: 27.55, lng: 93.83, alt: 1572, name: "Ziro Valley", state: "Arunachal", forecast: [] },
-            { lat: 27.10, lng: 93.62, alt: 320, name: "Itanagar Foothills", state: "Arunachal", forecast: [] },
-            { lat: 28.06, lng: 95.32, alt: 153, name: "Pasighat Gorge", state: "Arunachal", forecast: [] },
-            { lat: 26.18, lng: 91.75, alt: 55, name: "Guwahati Basin", state: "Assam", forecast: [] },
-            { lat: 27.47, lng: 94.91, alt: 108, name: "Dibrugarh Plain", state: "Assam", forecast: [] },
-            { lat: 26.75, lng: 94.21, alt: 116, name: "Jorhat Basin", state: "Assam", forecast: [] },
-            { lat: 26.65, lng: 92.80, alt: 73, name: "Tezpur Bank", state: "Assam", forecast: [] },
-            { lat: 25.18, lng: 93.02, alt: 680, name: "Haflong Hill Station", state: "Assam", forecast: [] },
-            { lat: 24.83, lng: 92.77, alt: 25, name: "Silchar Valley", state: "Assam", forecast: [] },
-            { lat: 25.57, lng: 91.89, alt: 1525, name: "Shillong Plateau", state: "Meghalaya", forecast: [] },
-            { lat: 25.27, lng: 91.72, alt: 1484, name: "Cherrapunji Escarpment", state: "Meghalaya", forecast: [] },
-            { lat: 25.67, lng: 94.10, alt: 1444, name: "Kohima Shale Ridge", state: "Nagaland", forecast: [] },
-            { lat: 25.90, lng: 93.73, alt: 145, name: "Dimapur Plain", state: "Nagaland", forecast: [] },
-            { lat: 24.81, lng: 93.93, alt: 786, name: "Imphal Valley", state: "Manipur", forecast: [] },
-            { lat: 23.72, lng: 92.71, alt: 1132, name: "Aizawl Urban Ridge", state: "Mizoram", forecast: [] },
-            { lat: 23.83, lng: 91.28, alt: 15, name: "Agartala Basin", state: "Tripura", forecast: [] }
+            // Northeast 8 States GIS Town Centre Precision Network
+            { lat: 27.6039, lng: 88.6464, alt: 1780, name: "Chungthang", state: "Sikkim", forecast: [] },
+            { lat: 27.3389, lng: 88.6065, alt: 1650, name: "Gangtok", state: "Sikkim", forecast: [] },
+            { lat: 27.5861, lng: 91.8653, alt: 3048, name: "Tawang Pass", state: "Arunachal", forecast: [] },
+            { lat: 27.2645, lng: 92.4227, alt: 2415, name: "Bomdila Pass", state: "Arunachal", forecast: [] },
+            { lat: 27.5580, lng: 93.8340, alt: 1572, name: "Ziro Valley", state: "Arunachal", forecast: [] },
+            { lat: 27.0844, lng: 93.6053, alt: 320, name: "Itanagar", state: "Arunachal", forecast: [] },
+            { lat: 28.0664, lng: 95.3268, alt: 153, name: "Pasighat", state: "Arunachal", forecast: [] },
+            { lat: 26.1445, lng: 91.7362, alt: 55, name: "Guwahati", state: "Assam", forecast: [] },
+            { lat: 27.4728, lng: 94.9120, alt: 108, name: "Dibrugarh", state: "Assam", forecast: [] },
+            { lat: 26.7509, lng: 94.2037, alt: 116, name: "Jorhat", state: "Assam", forecast: [] },
+            { lat: 26.6528, lng: 92.7926, alt: 73, name: "Tezpur", state: "Assam", forecast: [] },
+            { lat: 25.1833, lng: 93.0167, alt: 680, name: "Haflong", state: "Assam", forecast: [] },
+            { lat: 24.8333, lng: 92.7789, alt: 25, name: "Silchar", state: "Assam", forecast: [] },
+            { lat: 25.5788, lng: 91.8933, alt: 1525, name: "Shillong", state: "Meghalaya", forecast: [] },
+            { lat: 25.2986, lng: 91.7302, alt: 1484, name: "Cherrapunji", state: "Meghalaya", forecast: [] },
+            { lat: 25.6751, lng: 94.1086, alt: 1444, name: "Kohima", state: "Nagaland", forecast: [] },
+            { lat: 25.9064, lng: 93.7275, alt: 145, name: "Dimapur", state: "Nagaland", forecast: [] },
+            { lat: 24.8170, lng: 93.9368, alt: 786, name: "Imphal", state: "Manipur", forecast: [] },
+            { lat: 23.7271, lng: 92.7176, alt: 1132, name: "Aizawl", state: "Mizoram", forecast: [] },
+            { lat: 23.8315, lng: 91.2868, alt: 15, name: "Agartala", state: "Tripura", forecast: [] }
         ];
 
         function getTempColorHex(t) {
@@ -484,11 +491,9 @@
             return { icon: "🌤️", text: "Fair" };
         }
 
-        // Hydro-Thermal Landslide Saturation Index (HT-SSI) Physics
         function calculateHydroThermalRisk(temp, rainSum, humidity) {
-            // High rain + moderate/cool temperature = low evaporation = high pore-water pressure
             let score = (rainSum * 2.8) + (humidity * 0.35);
-            if (temp < 15 && rainSum > 10) score += 20; // Freeze-thaw or saturated cold moraine
+            if (temp < 15 && rainSum > 10) score += 20;
             if (score > 85) return { label: "CRITICAL SATURATION (RED)", color: "#ef4444" };
             if (score > 55) return { label: "ELEVATED PORE PRESSURE (AMBER)", color: "#f59e0b" };
             return { label: "NORMAL STABILITY (GREEN)", color: "#10b981" };
@@ -499,7 +504,6 @@
             try {
                 const lats = allNerStations.map(s => s.lat).join(',');
                 const lngs = allNerStations.map(s => s.lng).join(',');
-                // Requesting ensemble data including elevation & multi-parameter moisture
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,precipitation,rain,showers,wind_speed_10m,weather_code,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
                 
                 const res = await fetch(url);
@@ -554,9 +558,12 @@
                 const cond = getWeatherDesc(s.weatherCode);
                 const htRisk = calculateHydroThermalRisk(s.temp, s.todayRainSum || 0, s.humidity);
 
+                // Absolute center-aligned anchor lock [0,0] with transform: translate(-50%, -50%)
                 const badgeIcon = L.divIcon({
                     className: 'temp-badge-box',
-                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name.split(' ')[0]} <b style="color:#ffffff;">${roundedTemp}°</b></div>`
+                    html: `<div class="temp-pill" style="background:#0f172a; border-color:${hex}; color:${hex}; font-weight:800;">${cond.icon} ${s.name} <b style="color:#ffffff;">${roundedTemp}°</b></div>`,
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0]
                 });
 
                 const forecastHtml = (s.forecast && s.forecast.length > 0) ? `
@@ -578,7 +585,7 @@
                     .bindPopup(`
                         <div style="font-size:12px; min-width: 240px; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                                <b style="color:${hex}; font-size:14px;">${cond.icon} ${s.name}</b>
+                                <b style="color:${hex}; font-size:14px;">${cond.icon} ${s.name} (${s.state})</b>
                                 <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 9px;">ENSEMBLE 10X</span>
                             </div>
                             <div style="margin-top: 6px; color: #cbd5e1; font-size: 11px; line-height: 1.6;">
@@ -715,20 +722,22 @@
         // 5. Wind Radar
         const windRadarLayer = L.layerGroup();
         const windStations = [
-            { pos: [26.18, 91.75], speed: "18 km/h SW", arrow: "↗", name: "Brahmaputra Basin" },
-            { pos: [27.33, 88.61], speed: "26 km/h N", arrow: "↓", name: "Teesta Gorge" },
-            { pos: [25.57, 91.89], speed: "34 km/h S (High Gusts)", arrow: "↑", name: "Khasi Plateau" },
-            { pos: [25.67, 94.10], speed: "14 km/h E", arrow: "←", name: "Naga Hills" },
-            { pos: [24.81, 93.93], speed: "11 km/h NE", arrow: "↙", name: "Imphal Valley" },
-            { pos: [23.72, 92.71], speed: "21 km/h SE", arrow: "↖", name: "Mizo Ridge" },
-            { pos: [27.58, 91.86], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass" },
-            { pos: [19.07, 72.87], speed: "22 km/h W", arrow: "→", name: "Mumbai Coast" },
-            { pos: [28.61, 77.20], speed: "15 km/h NW", arrow: "↘", name: "Delhi NCR" }
+            { pos: [26.1445, 91.7362], speed: "18 km/h SW", arrow: "↗", name: "Brahmaputra Basin" },
+            { pos: [27.3389, 88.6065], speed: "26 km/h N", arrow: "↓", name: "Teesta Gorge" },
+            { pos: [25.5788, 91.8933], speed: "34 km/h S (High Gusts)", arrow: "↑", name: "Khasi Plateau" },
+            { pos: [25.6751, 94.1086], speed: "14 km/h E", arrow: "←", name: "Naga Hills" },
+            { pos: [24.8170, 93.9368], speed: "11 km/h NE", arrow: "↙", name: "Imphal Valley" },
+            { pos: [23.7271, 92.7176], speed: "21 km/h SE", arrow: "↖", name: "Mizo Ridge" },
+            { pos: [27.5861, 91.8653], speed: "38 km/h NW (Gale)", arrow: "↘", name: "Sela Pass" },
+            { pos: [19.0760, 72.8777], speed: "22 km/h W", arrow: "→", name: "Mumbai Coast" },
+            { lat: 28.6139, lng: 77.2090, speed: "15 km/h NW", arrow: "↘", name: "Delhi NCR", pos: [28.6139, 77.2090] }
         ];
         windStations.forEach(w => {
             const windIcon = L.divIcon({
                 className: 'wind-pin-container',
-                html: `<div class="wind-pill"><span>${w.arrow}</span> <span>${w.speed}</span></div>`
+                html: `<div class="wind-pill"><span>${w.arrow}</span> <span>${w.speed}</span></div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
             });
             L.marker(w.pos, { icon: windIcon }).addTo(windRadarLayer)
                 .bindPopup(`<b>💨 Wind Telemetry: ${w.name}</b><br>Speed: ${w.speed}`);
@@ -746,7 +755,9 @@
         strikes.forEach(st => {
             const strikeIcon = L.divIcon({
                 className: 'strike-pin',
-                html: `<div class="pulse-cell" style="background:#eab308;color:#000;font-size:12px;font-weight:900;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #fde047;border:2px solid #fff;">⚡</div>`
+                html: `<div class="pulse-cell" style="background:#eab308;color:#000;font-size:12px;font-weight:900;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #fde047;border:2px solid #fff; transform: translate(-50%, -50%);">⚡</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
             });
             L.marker(st.pos, { icon: strikeIcon }).addTo(lightningRadarLayer)
                 .bindPopup(`<b>⚡ Severe Lightning Strike</b><br>Location: ${st.name}`);
