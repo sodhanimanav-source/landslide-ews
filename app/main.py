@@ -3,9 +3,13 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.database import engine, Base
-from app.routes import weather, reports, risk, alerts
+from app.migrate import reconcile_schema
+from app.routes import weather, reports, risk, alerts, v2
 
 Base.metadata.create_all(bind=engine)
+# create_all() does not alter tables that already exist. The shipped
+# landslide.db predates the current models, so reconcile before serving.
+reconcile_schema(engine)
 
 app = FastAPI(title="Landslide EWS API")
 
@@ -18,6 +22,7 @@ app.include_router(weather.router)
 app.include_router(reports.router)
 app.include_router(risk.router)
 app.include_router(alerts.router)
+app.include_router(v2.router)
 
 @app.get("/")
 def dashboard(request: Request):

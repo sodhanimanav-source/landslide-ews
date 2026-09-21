@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local database - must not be committed. A stale committed landslide.db
+# is what caused the alerts table schema mismatch.
+*.db
+*.sqlite3
+
+# Trained model artefacts are rebuilt by app/ml/train.py
+app/ml/model.joblib
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

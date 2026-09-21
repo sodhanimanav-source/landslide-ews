@@ -27,10 +27,12 @@ def get_risk_zones():
             elevation = 1200.0
 
         # 2. Run inference using trained ML model
+        # NOTE: the parameter is `rain_24h`, not `rainfall`. Passing
+        # `rainfall=` raised TypeError on every request to this endpoint.
         prediction = predict_landslide_risk(
             slope=zone["slope"],
             elevation=elevation,
-            rainfall=rainfall
+            rain_24h=rainfall,
         )
 
         computed_zones.append({

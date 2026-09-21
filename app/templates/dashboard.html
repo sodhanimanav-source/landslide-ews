@@ -398,39 +398,209 @@
 
         // 1. ALL 13 LANDSLIDE CORRIDORS & REGIONAL ZONES
         const landslideLayer = L.layerGroup().addTo(map);
+        // Geometry only. Every risk number on this map now comes from the
+        // BHU-KAAL engine via /api/v2/corridors -- the hardcoded strings that
+        // used to live here ("CRITICAL RED (91%)") were never computed from
+        // anything and have been removed.
         const corridors = [
-            { name: "Sikkim: NH-10 (Sevoke - Gangtok)", category: "Arterial Corridor", risk: "CRITICAL RED (91%)", coords: [[26.885, 88.472], [27.050, 88.435], [27.338, 88.606]], color: "#ef4444" },
-            { name: "North Sikkim: Chungthang - Mangan Belt", category: "GLOF & Moraine Zone", risk: "CRITICAL RED (88%)", coords: [[27.500, 88.650], [27.600, 88.640], [27.700, 88.700]], color: "#ef4444" },
-            { name: "Arunachal: Sela Pass - Tawang Corridor", category: "High Altitude Strategic Pass", risk: "HIGH RISK (84%)", coords: [[27.505, 92.100], [27.586, 91.865]], color: "#ef4444" },
-            { name: "Arunachal: Trans-Arunachal (Itanagar - Ziro)", category: "Highway Valley Stretch", risk: "AMBER ADVISORY (58%)", coords: [[27.100, 93.620], [27.350, 93.750], [27.550, 93.830]], color: "#f59e0b" },
-            { name: "Nagaland: NH-29 (Chumukedima - Kohima)", category: "Fragile Shale Slopes", risk: "HIGH RISK (82%)", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]], color: "#ef4444" },
-            { name: "Assam Dima Hasao: Lumding - Badarpur Hill Rail", category: "Critical Rail Infrastructure", risk: "CRITICAL RED (89%)", coords: [[25.180, 93.020], [25.150, 93.100], [24.890, 92.850]], color: "#ef4444" },
-            { name: "Meghalaya: NH-6 Sonapur Tunnel Zone", category: "Heavy Rainfall Tunnel Corridor", risk: "HIGH RISK (79%)", coords: [[25.200, 92.350], [25.110, 92.380]], color: "#ef4444" },
-            { name: "Meghalaya: Cherrapunji - Mawsynram Escarpment", category: "Extreme Precipitation Plateau", risk: "AMBER ADVISORY (64%)", coords: [[25.2986, 91.7302], [25.300, 91.580]], color: "#f59e0b" },
-            { name: "Manipur: NH-37 (Imphal - Jiribam Highway)", category: "Mudflow & Debris Corridor", risk: "CRITICAL RED (86%)", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]], color: "#ef4444" },
-            { name: "Manipur: Tupul - Noney Railway Basin", category: "Geological Fracture Zone", risk: "HIGH RISK (85%)", coords: [[24.710, 93.650], [24.740, 93.600]], color: "#ef4444" },
-            { name: "Mizoram: NH-54 (Aizawl - Lunglei Axis)", category: "Urban Ridge & Valley Highway", risk: "HIGH RISK (76%)", coords: [[23.727, 92.717], [23.100, 92.730], [22.880, 92.740]], color: "#ef4444" },
-            { name: "Tripura: Jampui Hills Ridge", category: "Sedimentary Formation", risk: "LOW RISK (28%)", coords: [[23.950, 92.280], [23.750, 92.290]], color: "#10b981" },
-            { name: "Meghalaya: Shillong Bypass NH-206", category: "Stable Granite Terrain", risk: "LOW RISK (22%)", coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]], color: "#10b981" }
+            { id: "nh10-sevoke-gangtok", name: "Sikkim: NH-10 (Sevoke - Gangtok)", category: "Arterial Corridor", coords: [[26.885, 88.472], [27.050, 88.435], [27.338, 88.606]] },
+            { id: "chungthang-mangan", name: "North Sikkim: Chungthang - Mangan Belt", category: "GLOF & Moraine Zone", coords: [[27.500, 88.650], [27.600, 88.640], [27.700, 88.700]] },
+            { id: "sela-tawang", name: "Arunachal: Sela Pass - Tawang Corridor", category: "High Altitude Strategic Pass", coords: [[27.505, 92.100], [27.586, 91.865]] },
+            { id: "itanagar-ziro", name: "Arunachal: Trans-Arunachal (Itanagar - Ziro)", category: "Highway Valley Stretch", coords: [[27.100, 93.620], [27.350, 93.750], [27.550, 93.830]] },
+            { id: "nh29-kohima", name: "Nagaland: NH-29 (Chumukedima - Kohima)", category: "Fragile Shale Slopes", coords: [[25.795, 93.765], [25.710, 93.980], [25.670, 94.108]] },
+            { id: "lumding-badarpur", name: "Assam Dima Hasao: Lumding - Badarpur Hill Rail", category: "Critical Rail Infrastructure", coords: [[25.180, 93.020], [25.150, 93.100], [24.890, 92.850]] },
+            { id: "nh6-sonapur", name: "Meghalaya: NH-6 Sonapur Tunnel Zone", category: "Heavy Rainfall Tunnel Corridor", coords: [[25.200, 92.350], [25.110, 92.380]] },
+            { id: "cherrapunji-mawsynram", name: "Meghalaya: Cherrapunji - Mawsynram Escarpment", category: "Extreme Precipitation Plateau", coords: [[25.2986, 91.7302], [25.300, 91.580]] },
+            { id: "nh37-imphal-jiribam", name: "Manipur: NH-37 (Imphal - Jiribam Highway)", category: "Mudflow & Debris Corridor", coords: [[24.817, 93.936], [24.780, 93.500], [24.800, 93.130]] },
+            { id: "tupul-noney", name: "Manipur: Tupul - Noney Railway Basin", category: "Geological Fracture Zone", coords: [[24.710, 93.650], [24.740, 93.600]] },
+            { id: "nh54-aizawl-lunglei", name: "Mizoram: NH-54 (Aizawl - Lunglei Axis)", category: "Urban Ridge & Valley Highway", coords: [[23.727, 92.717], [23.100, 92.730], [22.880, 92.740]] },
+            { id: "jampui-hills", name: "Tripura: Jampui Hills Ridge", category: "Sedimentary Formation", coords: [[23.950, 92.280], [23.750, 92.290]] },
+            { id: "shillong-bypass", name: "Meghalaya: Shillong Bypass NH-206", category: "Stable Granite Terrain", coords: [[25.578, 91.893], [25.350, 91.950], [25.180, 92.020]] }
         ];
-
-        corridors.forEach(c => {
-            L.polyline(c.coords, { color: c.color, weight: 6, opacity: 0.95 }).addTo(landslideLayer)
-                .bindPopup(`<b>${c.name}</b><br>Type: <i>${c.category}</i><br>Risk Level: <b style="color:${c.color}">${c.risk}</b>`);
-        });
 
         const regionZones = [
-            { pos: [27.3389, 88.6065], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
-            { pos: [25.1833, 93.0167], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
-            { pos: [23.7271, 92.7176], name: "Aizawl Urban Ridge", state: "Mizoram", desc: "Fragile shale rock & surface water infiltration risk." },
-            { pos: [27.5861, 91.8653], name: "Tawang High Plateau", state: "Arunachal", desc: "Freeze-thaw weathering and steep moraine debris." },
-            { pos: [25.6751, 94.1086], name: "Kohima Town Ridges", state: "Nagaland", desc: "Continuous road sinking & creeping slope deformation." }
+            { id: "gangtok-urban", pos: [27.3389, 88.6065], name: "Gangtok Urban Slopes", state: "Sikkim", desc: "High density construction on steep slope cuts." },
+            { id: "haflong", pos: [25.1833, 93.0167], name: "Haflong Hill Station", state: "Assam", desc: "Soil subsidence & massive rotational slope slump." },
+            { id: "aizawl-ridge", pos: [23.7271, 92.7176], name: "Aizawl Urban Ridge", state: "Mizoram", desc: "Fragile shale rock & surface water infiltration risk." },
+            { id: "tawang-plateau", pos: [27.5861, 91.8653], name: "Tawang High Plateau", state: "Arunachal", desc: "Freeze-thaw weathering and steep moraine debris." },
+            { id: "kohima-ridges", pos: [25.6751, 94.1086], name: "Kohima Town Ridges", state: "Nagaland", desc: "Continuous road sinking & creeping slope deformation." }
         ];
 
-        regionZones.forEach(z => {
-            L.circle(z.pos, { radius: 12000, color: "#f43f5e", fillColor: "#f43f5e", fillOpacity: 0.25, weight: 2 }).addTo(landslideLayer)
-                .bindPopup(`<b>📍 ${z.name} (${z.state})</b><br>${z.desc}`);
-        });
+        // ---- BHU-KAAL live engine binding -------------------------------
+        const ALERT_STYLE = {
+            evacuate: { color: "#dc2626", label: "EVACUATE", weight: 8 },
+            warning:  { color: "#ef4444", label: "WARNING",  weight: 7 },
+            advisory: { color: "#f59e0b", label: "ADVISORY", weight: 6 },
+            watch:    { color: "#eab308", label: "WATCH",    weight: 5 },
+            none:     { color: "#10b981", label: "NO ALERT", weight: 4 },
+            unknown:  { color: "#64748b", label: "NO DATA",  weight: 4 }
+        };
+
+        const REGIME_NOTE = {
+            synchronous: "No warning window - act on the forecast",
+            delayed: "Staged response is viable",
+            creep: "Monitoring watchlist",
+            stable: "No meaningful perturbation"
+        };
+
+        let engineState = {};       // site id -> assessment
+        let forecastHours = 24;     // forecast mode by default
+
+        function styleFor(a) {
+            return ALERT_STYLE[(a && a.alert_level) || "unknown"] || ALERT_STYLE.unknown;
+        }
+
+        function pct(x) {
+            return (x === null || x === undefined) ? "--" : (x * 100).toFixed(1) + "%";
+        }
+
+        function enginePopup(meta, a) {
+            if (!a || a.error) {
+                return `<div style="font-size:12px;min-width:250px;color:#f8fafc;">
+                    <b>${meta.name}</b><br>
+                    <span style="color:#94a3b8;font-size:11px;">Type: ${meta.category || meta.state || ''}</span>
+                    <div style="margin-top:8px;color:#fca5a5;font-size:11px;">
+                        Engine unavailable${a && a.error ? ': ' + a.error : ''}.
+                    </div></div>`;
+            }
+            const s = styleFor(a);
+            const src = a.rainfall && a.rainfall.source ? a.rainfall.source : 'unknown';
+            const synthetic = src === 'synthetic';
+            const dist = a.disturbance_index > 0.01
+                ? `<div>🪓 <span style="color:#94a3b8;">Recent slope cutting:</span>
+                     <b style="color:#fb923c;">index ${a.disturbance_index.toFixed(2)}</b>
+                     <span style="color:#94a3b8;">, cut ${a.months_since_disturbance} months ago</span></div>`
+                : `<div>🌲 <span style="color:#94a3b8;">No recent disturbance detected</span></div>`;
+
+            return `
+            <div style="font-size:12px; min-width:290px; color:#f8fafc; font-family: ui-sans-serif, system-ui, sans-serif;">
+                <div style="border-bottom:1px solid #334155; padding-bottom:5px;">
+                    <b style="font-size:13px;">${meta.name}</b><br>
+                    <span style="background:${s.color};color:#fff;font-size:10px;font-weight:800;
+                          padding:2px 7px;border-radius:3px;letter-spacing:.5px;">${s.label}</span>
+                    <span style="color:#94a3b8;font-size:10px;margin-left:6px;">${meta.category || meta.state || ''}</span>
+                </div>
+                <div style="margin-top:7px; color:#cbd5e1; font-size:11px; line-height:1.7;">
+                    <div>⏱️ <span style="color:#94a3b8;">Warning time left:</span>
+                        <b style="color:#facc15;">${a.lead_time_label || '--'}</b></div>
+                    <div>🧮 <span style="color:#94a3b8;">Failure probability:</span>
+                        <b style="color:#fff;">${pct(a.probability_of_failure)}</b>
+                        <span style="color:#64748b;">[${pct(a.probability_interval ? a.probability_interval[0] : null)} – ${pct(a.probability_interval ? a.probability_interval[1] : null)}]</span></div>
+                    <div>🎯 <span style="color:#94a3b8;">Action threshold:</span>
+                        <b style="color:#fff;">${pct(a.threshold)}</b>
+                        <span style="color:#64748b;">(${a.asset_class})</span></div>
+                    <div>⚙️ <span style="color:#94a3b8;">Regime:</span>
+                        <b style="color:#38bdf8;">${a.regime}</b>
+                        <span style="color:#64748b;">— ${REGIME_NOTE[a.regime] || ''}</span></div>
+                    ${dist}
+                    <div>🪨 <span style="color:#94a3b8;">Slope / lithology:</span>
+                        <b style="color:#fff;">${meta.slope_deg ?? a.slope_deg}°</b>
+                        <span style="color:#64748b;">${a.lithology || ''}</span></div>
+                    <div style="margin-top:5px;color:${synthetic ? '#fbbf24' : '#64748b'};font-size:10px;">
+                        ${synthetic ? '⚠️ SYNTHETIC rainfall (weather API unreachable)' : '🌧️ Rainfall: ' + src}
+                        ${a.rainfall ? ' · ' + a.rainfall.last_24h_mm + ' mm/24h' : ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        async function refreshEngine() {
+            const badge = document.getElementById('engine-badge');
+            if (badge) { badge.textContent = 'ENGINE: updating…'; badge.style.background = '#334155'; }
+            landslideLayer.clearLayers();
+
+            let byId = {};
+            let ok = false;
+            try {
+                const res = await fetch(`/api/v2/corridors?forecast_hours=${forecastHours}&n_draws=64`);
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    data.forEach(d => { byId[d.id] = d; });
+                    ok = true;
+                }
+            } catch (err) {
+                console.error('BHU-KAAL engine unreachable', err);
+            }
+            engineState = byId;
+
+            corridors.forEach(c => {
+                const a = byId[c.id];
+                const s = styleFor(a);
+                L.polyline(c.coords, { color: s.color, weight: s.weight, opacity: 0.95 })
+                    .addTo(landslideLayer)
+                    .bindPopup(enginePopup(c, a));
+            });
+
+            regionZones.forEach(z => {
+                const a = byId[z.id];
+                const s = styleFor(a);
+                L.circle(z.pos, {
+                    radius: 12000, color: s.color, fillColor: s.color,
+                    fillOpacity: 0.22, weight: 2
+                }).addTo(landslideLayer).bindPopup(enginePopup(z, a));
+            });
+
+            if (badge) {
+                const evac = Object.values(byId).filter(d => d.alert_level === 'evacuate').length;
+                const sync = Object.values(byId).filter(d => d.regime === 'synchronous').length;
+                badge.textContent = ok
+                    ? `ENGINE LIVE · ${Object.keys(byId).length} sites · ${evac} evacuate · ${sync} zero-warning`
+                    : 'ENGINE OFFLINE';
+                badge.style.background = ok ? (evac ? '#dc2626' : '#065f46') : '#7f1d1d';
+            }
+        }
+
+        // Alert-level legend, plus the warning-time explainer that is the
+        // whole point of this system.
+        const bhukaalLegend = L.control({ position: 'bottomleft' });
+        bhukaalLegend.onAdd = function () {
+            const div = L.DomUtil.create('div');
+            div.style.cssText = 'background:rgba(15,23,42,.92);color:#e2e8f0;padding:9px 11px;'
+                + 'border-radius:6px;font:11px ui-sans-serif,system-ui;line-height:1.7;'
+                + 'border:1px solid #334155;min-width:186px;';
+            div.innerHTML =
+                '<div style="font-weight:800;font-size:11px;letter-spacing:.4px;margin-bottom:5px;">BHU-KAAL ALERT LEVEL</div>'
+                + Object.entries(ALERT_STYLE).filter(([k]) => k !== 'unknown').map(([k, v]) =>
+                    `<div><span style="display:inline-block;width:11px;height:11px;background:${v.color};border-radius:2px;margin-right:6px;"></span>${v.label}</div>`
+                ).join('')
+                + '<div style="margin-top:7px;padding-top:6px;border-top:1px solid #334155;color:#94a3b8;font-size:10px;">'
+                + 'Click any corridor for warning time,<br>failure probability and its drivers.</div>';
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        };
+        bhukaalLegend.addTo(map);
+
+        // Status badge + forecast toggle
+        const bhukaalStatus = L.control({ position: 'topright' });
+        bhukaalStatus.onAdd = function () {
+            const div = L.DomUtil.create('div');
+            div.style.cssText = 'display:flex;gap:6px;align-items:center;';
+            div.innerHTML =
+                '<span id="engine-badge" style="background:#334155;color:#fff;font:700 10px ui-sans-serif,system-ui;'
+                + 'padding:5px 9px;border-radius:4px;letter-spacing:.3px;">ENGINE: starting…</span>'
+                + '<button id="engine-refresh" style="background:#1e293b;color:#e2e8f0;border:1px solid #475569;'
+                + 'font:700 10px ui-sans-serif,system-ui;padding:5px 9px;border-radius:4px;cursor:pointer;">↻</button>'
+                + '<button id="engine-forecast" style="background:#1e293b;color:#e2e8f0;border:1px solid #475569;'
+                + 'font:700 10px ui-sans-serif,system-ui;padding:5px 9px;border-radius:4px;cursor:pointer;">FORECAST 24h</button>';
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        };
+        bhukaalStatus.addTo(map);
+
+        setTimeout(() => {
+            const rb = document.getElementById('engine-refresh');
+            const fb = document.getElementById('engine-forecast');
+            if (rb) rb.onclick = refreshEngine;
+            if (fb) fb.onclick = () => {
+                forecastHours = forecastHours ? 0 : 24;
+                fb.textContent = forecastHours ? 'FORECAST 24h' : 'OBSERVED ONLY';
+                refreshEngine();
+            };
+            refreshEngine();
+        }, 0);
+
+        // Re-assess every 10 minutes.
+        setInterval(refreshEngine, 600000);
 
         // 2. ALL 4 CATCHMENT BASINS & DOWNSTREAM BUFFERS
         const catchmentLayer = L.layerGroup().addTo(map);

@@ -1,0 +1,20 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+jinja2
+python-multipart
+requests
+scikit-learn
+joblib
+pandas
+psycopg2-binary
+
+# BHU-KAAL engine
+numpy>=1.24
+scipy>=1.10
+
+# Optional: surrogate model training + SHAP attribution.
+# The live API runs the physics directly and does not need these.
+# xgboost>=2.0
+# shap>=0.44
